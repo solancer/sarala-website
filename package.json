@@ -1,0 +1,18 @@
+{
+  "name": "sarala-website",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marketing site for Sarala — a seamless WYSIWYG Markdown editor.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.2.5"
+  }
+}

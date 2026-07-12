@@ -9,8 +9,10 @@
   var STORE = "sarala-theme";
 
   function applyTheme(name, persist) {
-    if (THEMES.indexOf(name) === -1) name = "pro";
+    if (THEMES.indexOf(name) === -1) name = "classic";
     document.documentElement.setAttribute("data-theme", name);
+    var mt = document.querySelector('meta[name="theme-color"]');
+    if (mt) mt.setAttribute("content", name === "paper" ? "#f3eee3" : "#221f22");
     if (persist !== false) {
       try { localStorage.setItem(STORE, name); } catch (e) {}
     }
@@ -27,8 +29,8 @@
     if (t) { applyTheme(t.getAttribute("data-set-theme"), true); }
   });
 
-  var saved = "pro";
-  try { saved = localStorage.getItem(STORE) || "pro"; } catch (e) {}
+  var saved = "classic";
+  try { saved = localStorage.getItem(STORE) || "classic"; } catch (e) {}
   applyTheme(saved, false);
 
   /* ---------- NAV scrolled state ---------- */
@@ -71,6 +73,15 @@
       if (r.top < (window.innerHeight || 800)) { el.classList.add("in"); }
     });
   }, 600);
+  // Deep-links / nav-jumps to an in-page anchor (e.g. #download) smooth-scroll
+  // to a target whose .reveal content may still be hidden once scrolling stops.
+  // Re-run checkReveal for a beat after any hash navigation so it can't stay blank.
+  function revealBurst() {
+    var n = 0;
+    var id = setInterval(function () { checkReveal(); if (++n > 14) clearInterval(id); }, 90);
+  }
+  window.addEventListener("hashchange", revealBurst);
+  if (location.hash && location.hash.length > 1) { setTimeout(revealBurst, 60); }
 
   /* ---------- HERO TYPING DEMO ---------- */
   // Each step: {type:"type", el, segs:[{t,c}], speed} or {type:"show", el}
@@ -221,6 +232,144 @@
     }
     window.addEventListener("scroll", startTw, { passive: true });
     setTimeout(startTw, 800);
+  }
+
+  /* ---------- DOWNLOAD OS PICKER ---------- */
+  var dlPicker = document.getElementById("dl-picker");
+  if (dlPicker) {
+    var dlCta = document.getElementById("dl-cta");
+    var dlLabel = document.getElementById("dl-cta-label");
+    var dlFile = document.getElementById("dl-file");
+    var dlSize = document.getElementById("dl-size");
+    var osBtns = Array.prototype.slice.call(dlPicker.querySelectorAll(".dl-os"));
+    var altBlocks = Array.prototype.slice.call(document.querySelectorAll(".dl-alt"));
+
+    function selectOS(os) {
+      var matched = false;
+      osBtns.forEach(function (b) {
+        var on = b.getAttribute("data-os") === os;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        if (on) {
+          matched = true;
+          dlCta.href = b.getAttribute("data-href");
+          dlLabel.textContent = "Download for " + b.getAttribute("data-label");
+          dlFile.textContent = b.getAttribute("data-file");
+          dlSize.textContent = b.getAttribute("data-size");
+        }
+      });
+      if (!matched) return;
+      altBlocks.forEach(function (a) {
+        a.classList.toggle("on", a.getAttribute("data-os") === os);
+      });
+    }
+
+    osBtns.forEach(function (b) {
+      b.addEventListener("click", function () { selectOS(b.getAttribute("data-os")); });
+    });
+
+    // auto-detect the visitor's OS
+    var probe = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "") +
+                " " + (navigator.userAgent || "");
+    var os = "mac"; // sensible default
+    if (/Win/i.test(probe)) os = "win";
+    else if (/Mac|iPhone|iPad|iPod/i.test(probe)) os = "mac";
+    else if (/Linux|X11|Ubuntu|Debian|Fedora|CrOS/i.test(probe) && !/Android/i.test(probe)) os = "linux";
+    selectOS(os);
+  }
+
+  /* ---------- SCREENSHOTS CAROUSEL + LIGHTBOX ---------- */
+  var track = document.getElementById("shots-track");
+  if (track) {
+    var shots = Array.prototype.slice.call(track.querySelectorAll(".shot"));
+    var dotsWrap = document.getElementById("shots-dots");
+    var prevBtn = document.querySelector(".shots-nav.prev");
+    var nextBtn = document.querySelector(".shots-nav.next");
+
+    var dots = shots.map(function (s, i) {
+      var d = document.createElement("button");
+      d.setAttribute("aria-label", "Go to screenshot " + (i + 1));
+      d.addEventListener("click", function () { scrollToShot(i); });
+      dotsWrap.appendChild(d);
+      return d;
+    });
+
+    function currentIndex() {
+      var c = track.scrollLeft + track.clientWidth / 2;
+      var best = 0, bestDist = Infinity;
+      shots.forEach(function (s, i) {
+        var center = s.offsetLeft + s.offsetWidth / 2;
+        var dist = Math.abs(center - c);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+      return best;
+    }
+    function updateDots() {
+      var idx = currentIndex();
+      dots.forEach(function (d, i) { d.classList.toggle("on", i === idx); });
+    }
+    function scrollToShot(i) {
+      i = Math.max(0, Math.min(shots.length - 1, i));
+      var s = shots[i];
+      track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.offsetWidth) / 2, behavior: "smooth" });
+    }
+    if (prevBtn) prevBtn.addEventListener("click", function () { scrollToShot(currentIndex() - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { scrollToShot(currentIndex() + 1); });
+    var craf;
+    track.addEventListener("scroll", function () {
+      if (craf) cancelAnimationFrame(craf);
+      craf = requestAnimationFrame(updateDots);
+    }, { passive: true });
+    updateDots();
+
+    // ----- lightbox -----
+    var lb = document.getElementById("lightbox");
+    var lbImg = document.getElementById("lb-img");
+    var lbCap = document.getElementById("lb-cap");
+    var lbIndex = 0;
+    var dragged = false;
+
+    function openLb(i) {
+      lbIndex = ((i % shots.length) + shots.length) % shots.length;
+      var s = shots[lbIndex];
+      var img = s.querySelector("img");
+      var cap = s.querySelector("figcaption");
+      lbImg.src = s.getAttribute("data-full") || img.getAttribute("src");
+      lbImg.alt = img.getAttribute("alt") || "";
+      lbCap.textContent = cap ? cap.textContent : "";
+      lb.hidden = false;
+      requestAnimationFrame(function () { lb.classList.add("open"); });
+      document.body.style.overflow = "hidden";
+    }
+    function closeLb() {
+      lb.classList.remove("open");
+      document.body.style.overflow = "";
+      setTimeout(function () { lb.hidden = true; lbImg.src = ""; }, 260);
+    }
+    function lbGo(dir) { openLb(lbIndex + dir); scrollToShot(((lbIndex % shots.length) + shots.length) % shots.length); }
+
+    // distinguish a click from a swipe/drag on the track
+    track.addEventListener("pointerdown", function () { dragged = false; }, { passive: true });
+    track.addEventListener("pointermove", function (e) { if (e.buttons) dragged = true; }, { passive: true });
+    shots.forEach(function (s, i) {
+      s.addEventListener("click", function () { if (!dragged) openLb(i); });
+    });
+
+    if (lb) {
+      lb.addEventListener("click", function (e) {
+        if (e.target === lb || e.target.closest(".lb-close")) closeLb();
+      });
+      var lbPrev = lb.querySelector(".lb-prev");
+      var lbNext = lb.querySelector(".lb-next");
+      if (lbPrev) lbPrev.addEventListener("click", function (e) { e.stopPropagation(); lbGo(-1); });
+      if (lbNext) lbNext.addEventListener("click", function (e) { e.stopPropagation(); lbGo(1); });
+      document.addEventListener("keydown", function (e) {
+        if (lb.hidden) return;
+        if (e.key === "Escape") closeLb();
+        else if (e.key === "ArrowLeft") lbGo(-1);
+        else if (e.key === "ArrowRight") lbGo(1);
+      });
+    }
   }
 
 })();

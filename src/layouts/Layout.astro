@@ -48,7 +48,7 @@ const jsonLd = {
 ---
 
 <!doctype html>
-<html lang="en" data-theme="pro">
+<html lang="en" data-theme="classic">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -57,7 +57,7 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#221f22" />
+    <meta name="theme-color" content="#211f1c" />
     <meta name="color-scheme" content="dark light" />
 
     <!-- Icons -->
@@ -99,6 +99,7 @@ const jsonLd = {
           var ok = ["pro", "classic", "octagon", "machine", "ristretto", "spectrum", "paper"];
           if (t && ok.indexOf(t) !== -1) {
             document.documentElement.setAttribute("data-theme", t);
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "paper" ? "#f3eee3" : "#221f22");
           }
         } catch (e) {}
       })();

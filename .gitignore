@@ -2,6 +2,9 @@
 dist/
 # dependencies
 node_modules/
+# this project uses npm — ignore stray pnpm artifacts
+pnpm-lock.yaml
+pnpm-workspace.yaml
 # astro
 .astro/
 # logs

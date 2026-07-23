@@ -958,3 +958,84 @@ h1.hero-title {
 .lb-nav svg { width: 24px; height: 24px; }
 .lb-prev { left: 3vw; } .lb-next { right: 3vw; }
 @media (max-width: 640px){ .lb-nav { width: 42px; height: 42px; } .lb-prev { left: 2vw; } .lb-next { right: 2vw; } }
+
+/* ============================================================
+   MOBILE REFINEMENTS
+   Fixes for small (phone) viewports — iPhone-class widths.
+   Grouped here so the breakpoint behavior is easy to audit.
+   ============================================================ */
+
+/* Tighten page gutters a touch on the smallest screens */
+@media (max-width: 520px){
+  .wrap { width: min(1180px, 100% - 32px); }
+}
+
+/* ---- NAV ---- */
+/* Below the tablet breakpoint the row is: brand · spacer · palette dots · CTA.
+   The 7 palette dots crowd the brand + Download button on phones, so drop
+   them (palette switching is still one tap away in the hero + Themes section)
+   and tighten the spacing so the Download CTA never clips off-screen. */
+@media (max-width: 700px){
+  .nav-inner { gap: 14px; }
+  .nav-mini-themes { display: none; }
+  .nav-cta { padding: 8px 15px; font-size: 14px; }
+  .brand { font-size: 18px; gap: 9px; }
+}
+
+/* ---- HERO ---- */
+@media (max-width: 560px){
+  /* Tighten the vertical rhythm so the hero reads as one composed unit
+     instead of a tall, sprawling stack. */
+  .hero { padding-top: 8px; }
+  .hero-mark { margin-bottom: 16px; }
+  .hero-mark::before { width: 168px; height: 168px; filter: blur(28px); }
+  .eyebrow { margin-bottom: 20px; }
+  .hero-sub { margin-top: 18px; }
+  .hero-cta-row { margin-top: 26px; }
+  .hero-meta { margin-top: 16px; }
+
+  /* Eyebrow → a crisp single-line announcement pill. The "free & open
+     source · GPL-3.0" lead is already covered by the title, meta and page,
+     so drop it here to keep the badge to one tidy line. */
+  .eyebrow {
+    white-space: normal; flex-wrap: wrap; justify-content: center;
+    text-align: center; max-width: 100%; line-height: 1.4;
+    font-size: 12.5px; padding: 7px 15px;
+  }
+  .eyebrow .eb-lead { display: none; }
+  .eyebrow b { color: var(--accent); }
+
+  /* CTAs → full-width, stacked, confident tap targets (primary on top). */
+  .hero-cta-row { flex-direction: column; gap: 12px; align-items: stretch; }
+  .hero-cta-row .btn { width: 100%; justify-content: center; padding: 15px 24px; }
+}
+
+/* The gradient phrase "finished document." is nbsp-locked; at the clamp's
+   40px floor it can graze the edge. Ease the floor and let long words break. */
+@media (max-width: 420px){
+  h1.hero-title { font-size: clamp(32px, 9vw, 40px); overflow-wrap: break-word; }
+}
+
+/* ---- MOCK EDITOR WINDOW ---- */
+@media (max-width: 560px){
+  /* The window title bar is a nowrap flex row; drop the decorative
+     sidebar-toggle / focus icons and tighten spacing so lights · title · tabs fit. */
+  .win-bar { gap: 8px; padding: 0 12px; }
+  .win-bar .win-tb-ico { display: none; }
+  .win-title { font-size: 12px; }
+  .win-tab { padding: 5px 9px; }
+  .lights i { width: 11px; height: 11px; }
+
+  /* The welcome doc is ~1000px tall — far too much decorative scroll on a
+     phone. Cap it and fade the tail so the window reads as a clean peek into
+     the app rather than an endless wall of sample text. */
+  .win-body { min-height: 0; }
+  .editor {
+    padding: 22px 20px 0; min-height: 0; max-height: 300px;
+    -webkit-mask-image: linear-gradient(#000 72%, transparent);
+            mask-image: linear-gradient(#000 72%, transparent);
+  }
+
+  /* Let the floating palette pill sit closer under the window. */
+  .palette-fly { margin-top: 14px; }
+}

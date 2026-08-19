@@ -332,27 +332,65 @@ safely("copy buttons", function () {
     btn.addEventListener("click", function () {
       const src = $(btn.getAttribute("data-copy"));
       if (!src) return;
-      const text = (src.textContent || "").trim();
+      // Multi-line blocks (like the Homebrew tap/trust/install trio) mark each
+      // command with .ln, so joining on newlines pastes as three real lines a
+      // shell runs one after another, instead of one fused, broken command.
+      const lines = $$(".ln", src);
+      const text = lines.length
+        ? lines.map(function (l) { return (l.textContent || "").trim(); }).join("\n")
+        : (src.textContent || "").trim();
 
-      function fallback() {
-        // Select the command itself, so a manual ⌘C still works.
+      // Legacy execCommand only counts as "triggered by a user gesture" -
+      // and so is only allowed to run at all - while it's still inside the
+      // synchronous call stack of this click handler. Running it later,
+      // from inside a rejected clipboard.writeText() promise, silently
+      // no-ops in several browsers, so it's attempted first and eagerly
+      // rather than as an async fallback.
+      function legacyCopy() {
         let ok = false;
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "-9999px";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          ta.setSelectionRange(0, text.length);
+          ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+        } catch (e) { ok = false; }
+        return ok;
+      }
+
+      // Last resort when the browser/embedding context blocks scripted
+      // clipboard access entirely (sandboxed iframes, strict Permissions
+      // Policy, etc.): select the visible command text so ⌘C/Ctrl+C still
+      // works by hand.
+      function selectManually() {
         try {
           const range = document.createRange();
           range.selectNodeContents(src);
           const sel = window.getSelection();
           sel.removeAllRanges();
           sel.addRange(range);
-          ok = document.execCommand("copy");
-          if (ok) sel.removeAllRanges();
-        } catch (e) { ok = false; }
-        paint(ok ? done : "Press ⌘C", ok);
+        } catch (e) { /* nothing more we can do */ }
+      }
+
+      if (legacyCopy()) {
+        paint(done, true);
+        return;
       }
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () { paint(done, true); }, fallback);
+        navigator.clipboard.writeText(text).then(
+          function () { paint(done, true); },
+          function () { selectManually(); paint("Press ⌘C", false); }
+        );
       } else {
-        fallback();
+        selectManually();
+        paint("Press ⌘C", false);
       }
     });
   });

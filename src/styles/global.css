@@ -863,7 +863,7 @@ h1.hero-title {
 .dl-cta { margin-top: 34px; font-size: 17.5px; padding: 17px 42px; border-radius: 14px; }
 .dl-meta { margin-top: 20px; font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--faint); }
 .dl-meta b { color: var(--muted); font-weight: 500; }
-.dl-alt { margin-top: 14px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--faint); display: none; }
+.dl-alt { margin-top: 16px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--faint); display: none; }
 .dl-alt.on { display: block; }
 .dl-alt a { color: var(--muted); border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); transition: color .2s; }
 .dl-alt a:hover { color: var(--accent); }
@@ -885,13 +885,60 @@ h1.hero-title {
 .dl-all svg { width: 13px; height: 13px; }
 
 /* ============================================================
+   macOS Homebrew — "Rather use Homebrew?" card
+   ============================================================ */
+.dl-alt.brew { display: none; scroll-margin-top: 92px; }
+.dl-alt.brew.on {
+  display: block; position: relative; isolation: isolate;
+  text-align: left; margin: 40px auto 0; max-width: 620px;
+  padding: 28px; border-radius: 20px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  font-family: inherit; font-size: 14px; color: var(--fg); line-height: 1.6;
+}
+/* the two cards are alternative paths, not a continuation of one another */
+.dl-alt.brew.on::before {
+  content: "or"; position: absolute; top: -13px; left: 28px;
+  padding: 3px 10px; border-radius: 999px;
+  background: var(--bg-panel); border: 1px solid var(--border);
+  color: var(--faint); font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+}
+.dl-alt.brew p { max-width: none; margin: 0; text-align: left; }
+.dl-alt.brew code {
+  font-family: "JetBrains Mono", monospace; font-size: 12.5px;
+  padding: 1px 5px; border-radius: 5px;
+  background: var(--bg-panel); border: 1px solid var(--border); color: var(--fg);
+}
+.dl-alt.brew .gk-fine b { color: var(--fg); font-weight: 600; }
+/* the lock card owns the accent; Homebrew reads as the calmer, greener path */
+.brew-sigil {
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 13%, transparent);
+  border-color: color-mix(in srgb, var(--green) 28%, transparent);
+}
+.brew-term { margin-top: 20px; }
+.brew-body { display: block; padding: 15px 16px; }
+.brew-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.brew-lines li { display: flex; gap: 9px; align-items: flex-start; min-width: 0; }
+.brew-lines li::before {
+  content: "$"; flex-shrink: 0; color: var(--green); user-select: none;
+}
+/* the caret belongs to the last line only, so the block reads as one session */
+.brew-lines li:not(:last-child) code::after { content: none; }
+.dl-alt.brew .brew-lines code {
+  /* reset the inline-chip treatment back to bare terminal text */
+  padding: 0; border: 0; background: none; border-radius: 0; font-size: inherit;
+}
+
+/* ============================================================
    macOS Gatekeeper — "Opening Sarala the first time" card
    ============================================================ */
 .dl-alt.gk { display: none; scroll-margin-top: 92px; }
 .dl-alt.gk.on {
   display: block; position: relative; isolation: isolate;
-  text-align: left; margin: 30px auto 0; max-width: 620px;
-  padding: 24px; border-radius: 20px;
+  text-align: left; margin: 32px auto 0; max-width: 620px;
+  padding: 28px; border-radius: 20px;
   background: var(--bg-deep);
   border: 1px solid var(--border);
   font-family: inherit; font-size: 14px; color: var(--fg); line-height: 1.6;
@@ -900,7 +947,7 @@ h1.hero-title {
 .dl-alt.gk p { max-width: none; margin: 0; text-align: left; }
 
 /* ---- header ---- */
-.gk-top { display: flex; gap: 14px; align-items: flex-start; }
+.gk-top { display: flex; gap: 16px; align-items: flex-start; }
 .gk-sigil {
   position: relative; flex-shrink: 0;
   width: 40px; height: 40px; border-radius: 12px;
@@ -915,7 +962,7 @@ h1.hero-title {
   border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent); opacity: 0;
 }
 .gk-titles h3 { font-size: 17px; font-weight: 600; letter-spacing: -.015em; line-height: 1.3; }
-.gk-titles p { margin-top: 5px; color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+.gk-titles p { margin-top: 6px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
 
 /* ---- segmented controls (method tabs + macOS version chips) ---- */
 .gk-tabs, .gk-vers {
@@ -923,7 +970,7 @@ h1.hero-title {
   padding: 4px; border-radius: 13px;
   background: var(--bg-deep); border: 1px solid var(--border);
 }
-.gk-tabs { margin-top: 20px; }
+.gk-tabs { margin-top: 24px; }
 .gk-thumb, .gk-vthumb, .dl-thumb {
   position: absolute; left: 0; top: 0; z-index: 0;
   border-radius: 10px; background: var(--accent); opacity: 0;
@@ -950,7 +997,7 @@ h1.hero-title {
 }
 .gk-tab.on .gk-tab-hint { opacity: .75; }
 .gk-ver { padding: 8px 10px; border-radius: 9px; font-size: 12.5px; font-weight: 600; }
-.gk-vers { margin-bottom: 18px; }
+.gk-vers { margin-bottom: 20px; }
 /* the method tabs own the accent; the version chips sit a level below it */
 .gk-vthumb { background: var(--bg-panel); border: 1px solid var(--border); }
 
@@ -959,15 +1006,15 @@ h1.hero-title {
 }
 
 /* ---- the swapping stages ---- */
-.gk-stage { margin-top: 18px; }
+.gk-stage { margin-top: 22px; }
 .gk-panel[hidden], .gk-steps[hidden] { display: none; }
 
 /* ---- stepper ---- */
-.gk-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
-.gk-step { position: relative; display: flex; gap: 13px; align-items: flex-start; min-width: 0; }
+.gk-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+.gk-step { position: relative; display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
 /* connector between the numbered dots */
 .gk-step:not(:last-child)::before {
-  content: ""; position: absolute; left: 12px; top: 31px; bottom: -20px; width: 2px;
+  content: ""; position: absolute; left: 12px; top: 31px; bottom: -24px; width: 2px;
   border-radius: 2px;
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--accent) 42%, transparent),
@@ -984,7 +1031,7 @@ h1.hero-title {
 }
 .gk-step-body { flex: 1; min-width: 0; }
 .gk-step-body h4 { font-size: 14.5px; font-weight: 600; letter-spacing: -.01em; line-height: 1.35; }
-.gk-step-body p { margin-top: 3px; color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+.gk-step-body p { margin-top: 4px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
 .gk-step-body b { color: var(--fg); font-weight: 600; }
 .gk-step-body code {
   font-family: "JetBrains Mono", monospace; font-size: 12.5px;
@@ -1002,7 +1049,7 @@ h1.hero-title {
 
 /* ---- terminal block ---- */
 .gk-term {
-  margin: 12px 0 0; border-radius: 12px; overflow: hidden;
+  margin: 14px 0 0; border-radius: 12px; overflow: hidden;
   background: var(--bg-deep); border: 1px solid var(--border);
 }
 .gk-term-bar {
@@ -1013,8 +1060,8 @@ h1.hero-title {
 .gk-term-bar .lights i { width: 9px; height: 9px; }
 .gk-term-title { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--faint); letter-spacing: .04em; }
 .gk-term-body {
-  position: relative; display: flex; gap: 9px; padding: 14px;
-  font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.55;
+  position: relative; display: flex; gap: 9px; padding: 15px 16px;
+  font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.6;
 }
 .gk-prompt { color: var(--green); flex-shrink: 0; user-select: none; }
 .gk-term-body code {
@@ -1056,31 +1103,33 @@ h1.hero-title {
 .gk-copy-icons .i-check { opacity: 0; transform: scale(.4); }
 .gk-copy.copied .i-copy { opacity: 0; }
 .gk-copy.copied .i-check { opacity: 1; transform: none; }
-.gk-fine { margin-top: 9px !important; color: var(--faint); font-size: 12.5px; line-height: 1.5; }
+.gk-fine { margin-top: 11px !important; color: var(--faint); font-size: 12.5px; line-height: 1.55; }
 
 /* ---- callout + fine print ---- */
 .gk-note {
-  display: flex; gap: 11px; align-items: flex-start;
-  margin-top: 20px; padding: 12px 14px; border-radius: 12px;
+  display: flex; gap: 12px; align-items: flex-start;
+  margin-top: 24px; padding: 14px 16px; border-radius: 12px;
   background: color-mix(in srgb, var(--yellow) 9%, transparent);
   border: 1px solid color-mix(in srgb, var(--yellow) 26%, transparent);
 }
 .gk-note > svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px; color: var(--yellow); }
-.gk-note p { color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+.gk-note p { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
 .gk-note b { color: var(--fg); font-weight: 600; }
 
 .gk-copy-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.gk-why { margin-top: 16px !important; font-size: 12.5px; color: var(--faint); line-height: 1.6; }
+.gk-why { margin-top: 20px !important; font-size: 12.5px; color: var(--faint); line-height: 1.6; }
 .gk-why a { color: var(--muted); border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); transition: color .2s; }
 .gk-why a:hover { color: var(--accent); }
 
 @media (max-width: 560px) {
-  .dl-alt.gk.on { padding: 18px 16px; border-radius: 16px; }
+  .dl-alt.gk.on { padding: 20px 18px; border-radius: 16px; margin-top: 28px; }
   .gk-tab { flex-direction: column; gap: 4px; padding: 9px 6px; font-size: 13px; }
   .gk-tab > svg { width: 14px; height: 14px; }
   .gk-tab-hint { font-size: 10px; }
   .gk-vers { flex-direction: column; }
   .gk-term-body { font-size: 12px; }
+  .dl-alt.brew.on { padding: 20px 18px 18px; border-radius: 16px; margin-top: 34px; }
+  .dl-alt.brew.on::before { left: 18px; }
 }
 @media (max-width: 460px){ .dl-os { padding: 10px 14px; font-size: 14px; } }
 @media (max-width: 460px){ .dl-os { padding: 10px 16px; font-size: 14.5px; } }

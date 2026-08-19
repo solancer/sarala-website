@@ -7,6 +7,13 @@ const ISSUES = `${GITHUB}/issues`;
 const CONTRIBUTING = `${GITHUB}/blob/main/CONTRIBUTING.md`;
 
 const QUARANTINE_CMD = `xattr -dr com.apple.quarantine ${MAC_APP_PATH}`;
+
+/** The Homebrew route: tap the repo, trust the cask once, install. */
+const BREW_CMDS = [
+  `brew tap solancer/sarala ${GITHUB}`,
+  "brew trust --cask solancer/sarala/sarala",
+  "brew install --cask --yes sarala",
+];
 ---
 
 <Layout>
@@ -654,7 +661,7 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
                   </span>
                   <div class="gk-titles">
                     <h3 id="gk-title">Opening Sarala the first time</h3>
-                    <p>macOS blocks apps that Apple hasn&rsquo;t notarized. Clearing it takes about ten seconds, and you only do it once.</p>
+                    <p>Installing the <code>.dmg</code> by hand? macOS blocks apps that Apple hasn&rsquo;t notarized. Clearing it takes about ten seconds, and you only do it once. Homebrew handles this for you.</p>
                   </div>
                 </div>
 
@@ -786,6 +793,33 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
                   <a href={RELEASES} target="_blank" rel="noopener">verify the release checksums</a> or
                   <a href={GITHUB} target="_blank" rel="noopener">build it from source</a> instead of taking our word for it.
                 </p>
+              </div>
+
+              <!-- ---- Homebrew: the no-download route (macOS only) ---- -->
+              <div class="dl-alt brew" data-os="mac" id="macos-homebrew" aria-labelledby="brew-title">
+                <div class="gk-top">
+                  <span class="gk-sigil brew-sigil" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5h10v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-9Z"></path><path d="M15 11h2.2a2.3 2.3 0 0 1 0 4.6H15"></path><path d="M8 6V4.2M12 6V3.6"></path></svg>
+                  </span>
+                  <div class="gk-titles">
+                    <h3 id="brew-title">Rather use Homebrew?</h3>
+                    <p>Three lines in Terminal instead of the download: no&nbsp;disk image to drag, no first-launch warning, and <code>brew upgrade</code> keeps Sarala current.</p>
+                  </div>
+                </div>
+
+                <figure class="gk-term brew-term">
+                  <figcaption class="gk-term-bar">
+                    <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span class="gk-term-title">Terminal</span>
+                  </figcaption>
+                  <div class="gk-term-body brew-body">
+                    <ol class="brew-lines" id="brew-cmd">
+                      {BREW_CMDS.map((cmd) => <li><code class="ln">{cmd}</code></li>)}
+                    </ol>
+                  </div>
+                </figure>
+
+                <p class="gk-fine"><b>tap</b> points Homebrew at the Sarala repository, <b>trust</b> approves that source once, and <b>install</b> puts Sarala&nbsp;{VERSION} in your Applications folder. Later on, <code>brew upgrade --cask sarala</code> updates it.</p>
               </div>
 
               <div>

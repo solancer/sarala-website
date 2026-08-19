@@ -41,47 +41,7 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* ---------- SCROLL REVEAL (manual, robust in embedded iframes) ---------- */
-  var revealEls = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
-  revealEls.forEach(function (el, i) {
-    el.style.transitionDelay = (Math.min(i % 6, 5) * 55) + "ms";
-  });
-  function checkReveal() {
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    for (var i = revealEls.length - 1; i >= 0; i--) {
-      var el = revealEls[i];
-      var r = el.getBoundingClientRect();
-      if (r.top < vh * 0.92 && r.bottom > 0) {
-        el.classList.add("in");
-        (function (node) {
-          // safety net: if the transition can't run (paused timeline),
-          // force the final visible state after the transition window.
-          setTimeout(function () { node.classList.add("settled"); }, 760);
-        })(el);
-        revealEls.splice(i, 1);
-      }
-    }
-  }
-  window.addEventListener("scroll", checkReveal, { passive: true });
-  window.addEventListener("resize", checkReveal);
-  checkReveal();
-  // safety nets: ensure nothing stays hidden in any environment
-  setTimeout(checkReveal, 250);
-  setTimeout(function () {
-    document.querySelectorAll(".reveal:not(.in)").forEach(function (el) {
-      var r = el.getBoundingClientRect();
-      if (r.top < (window.innerHeight || 800)) { el.classList.add("in"); }
-    });
-  }, 600);
-  // Deep-links / nav-jumps to an in-page anchor (e.g. #download) smooth-scroll
-  // to a target whose .reveal content may still be hidden once scrolling stops.
-  // Re-run checkReveal for a beat after any hash navigation so it can't stay blank.
-  function revealBurst() {
-    var n = 0;
-    var id = setInterval(function () { checkReveal(); if (++n > 14) clearInterval(id); }, 90);
-  }
-  window.addEventListener("hashchange", revealBurst);
-  if (location.hash && location.hash.length > 1) { setTimeout(revealBurst, 60); }
+  /* Scroll reveal now lives in motion.js (springs + stagger). */
 
   /* ---------- HERO TYPING DEMO ---------- */
   // Each step: {type:"type", el, segs:[{t,c}], speed} or {type:"show", el}
@@ -250,6 +210,7 @@
         var on = b.getAttribute("data-os") === os;
         b.classList.toggle("active", on);
         b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
         if (on) {
           matched = true;
           dlCta.href = b.getAttribute("data-href");
@@ -262,10 +223,23 @@
       altBlocks.forEach(function (a) {
         a.classList.toggle("on", a.getAttribute("data-os") === os);
       });
+      document.dispatchEvent(new CustomEvent("sarala:os", { detail: { os: os } }));
     }
 
-    osBtns.forEach(function (b) {
+    osBtns.forEach(function (b, i) {
       b.addEventListener("click", function () { selectOS(b.getAttribute("data-os")); });
+      // Roving-tabindex arrow keys, as a tablist is expected to behave.
+      b.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") next = osBtns[(i + 1) % osBtns.length];
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = osBtns[(i - 1 + osBtns.length) % osBtns.length];
+        else if (e.key === "Home") next = osBtns[0];
+        else if (e.key === "End") next = osBtns[osBtns.length - 1];
+        if (!next) return;
+        e.preventDefault();
+        selectOS(next.getAttribute("data-os"));
+        next.focus();
+      });
     });
 
     // auto-detect the visitor's OS
@@ -276,7 +250,42 @@
     else if (/Mac|iPhone|iPad|iPod/i.test(probe)) os = "mac";
     else if (/Linux|X11|Ubuntu|Debian|Fedora|CrOS/i.test(probe) && !/Android/i.test(probe)) os = "linux";
     selectOS(os);
+
+    // Deep link: /#macos-first-launch opens the Gatekeeper panel on any platform,
+    // so release notes and support replies can point straight at it. The panel
+    // starts hidden, so the browser's own hash jump never finds it.
+    var docEl = document.documentElement;
+
+    function aimAtNote(note, smooth) {
+      // The page uses `scroll-behavior: smooth`, and everything above the panel
+      // (lazy screenshots, reveal transforms) keeps resizing while a long
+      // animated scroll is in flight, which lands us past the target. Jump
+      // instantly instead, and re-aim as the layout settles.
+      var prev = docEl.style.scrollBehavior;
+      if (!smooth) docEl.style.scrollBehavior = "auto";
+      // block:"start" + scroll-margin-top lands on the heading, clearing the
+      // sticky nav; the panel is taller than a phone viewport.
+      note.scrollIntoView({ block: "start" });
+      if (!smooth) docEl.style.scrollBehavior = prev;
+    }
+
+    function openMacNote(smooth) {
+      if (location.hash !== "#macos-first-launch") return;
+      selectOS("mac");
+      var note = document.getElementById("macos-first-launch");
+      if (!note) return;
+      requestAnimationFrame(function () { aimAtNote(note, smooth); });
+      if (smooth) return;
+      window.addEventListener("load", function () {
+        aimAtNote(note, false);
+        setTimeout(function () { aimAtNote(note, false); }, 400);
+      });
+    }
+    window.addEventListener("hashchange", function () { openMacNote(true); });
+    openMacNote(false);
   }
+
+  /* Copy-to-clipboard now lives in motion.js (sweep + check animation). */
 
   /* ---------- SCREENSHOTS CAROUSEL + LIGHTBOX ---------- */
   var track = document.getElementById("shots-track");

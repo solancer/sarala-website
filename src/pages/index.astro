@@ -1,14 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, MAC_APP_PATH } from "../consts";
 
-const GITHUB = "https://github.com/solancer/sarala";
-const RELEASES = `${GITHUB}/releases`;
-const SNAP = "https://snapcraft.io/sarala";
-const VERSION = "0.4.3";
-const DL = `${GITHUB}/releases/download/v${VERSION}`;
 const LICENSE = `${GITHUB}/blob/main/LICENSE`;
 const ISSUES = `${GITHUB}/issues`;
 const CONTRIBUTING = `${GITHUB}/blob/main/CONTRIBUTING.md`;
+
+const QUARANTINE_CMD = `xattr -dr com.apple.quarantine ${MAC_APP_PATH}`;
 ---
 
 <Layout>
@@ -422,8 +420,8 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
             <h3>Always current</h3>
             <p>Built-in updater ships new versions the moment they land.</p>
             <div class="mini-ui">
-              <div class="mu-head"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg> Update available<span class="mu-done">0.4.3</span></div>
-              <div class="mu-row" style="padding:10px 12px">Sarala 0.4.3 — <span style="color:var(--accent)">Update now</span></div>
+              <div class="mu-head"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg> Update available<span class="mu-done">{VERSION}</span></div>
+              <div class="mu-row" style="padding:10px 12px">Sarala {VERSION} <span style="color:var(--accent)">Update now</span></div>
             </div>
           </div>
           <div class="bento-cell b-wide reveal">
@@ -601,62 +599,207 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
           <div class="cta-inner">
             <span class="kicker" style="justify-content:center">Get started</span>
             <h2>Download <span class="grad">Sarala</span></h2>
-            <p>The native, no-friction Markdown editor for Linux, macOS &amp; Windows. Free, open source, and yours to keep — v{VERSION}.</p>
+            <p>The native, no-friction Markdown editor for Linux, macOS &amp; Windows. Free, open source, and yours to keep.</p>
 
             <div class="dl-picker" id="dl-picker" role="tablist" aria-label="Choose your operating system">
-          <button type="button" class="dl-os" data-os="linux" data-label="Linux" data-file="Sarala_0.4.3_amd64.AppImage" data-size="89.0 MB" data-href={`${DL}/Sarala_0.4.3_amd64.AppImage`}>
-            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8.996 4.497c.104-.076.1-.168.186-.158s.022.102-.098.207c-.12.104-.308.243-.46.323-.291.152-.631.336-.993.336s-.647-.167-.853-.33c-.102-.082-.186-.162-.248-.221-.11-.086-.096-.207-.052-.204.075.01.087.109.134.153.064.06.144.137.241.214.195.154.454.304.778.304s.702-.19.932-.32c.13-.073.297-.204.433-.304M7.34 3.781c.055-.02.123-.031.174-.003.011.006.024.021.02.034-.012.038-.074.032-.11.05-.032.017-.057.052-.093.054-.034 0-.086-.012-.09-.046-.007-.044.058-.072.1-.089m.581-.003c.05-.028.119-.018.173.003.041.017.106.045.1.09-.004.033-.057.046-.09.045-.036-.002-.062-.037-.093-.053-.036-.019-.098-.013-.11-.051-.004-.013.008-.028.02-.034"></path><path fill-rule="evenodd" d="M8.446.019c2.521.003 2.38 2.66 2.364 4.093-.01.939.509 1.574 1.04 2.244.474.56 1.095 1.38 1.45 2.32.29.765.402 1.613.115 2.465a.8.8 0 0 1 .254.152l.001.002c.207.175.271.447.329.698.058.252.112.488.224.615.344.382.494.667.48.922-.015.254-.203.43-.435.57-.465.28-1.164.491-1.586 1.002-.443.527-.99.83-1.505.871a1.25 1.25 0 0 1-1.256-.716v-.001a1 1 0 0 1-.078-.21c-.67.038-1.252-.165-1.718-.128-.687.038-1.116.204-1.506.206-.151.331-.445.547-.808.63-.5.114-1.126 0-1.743-.324-.577-.306-1.31-.278-1.85-.39-.27-.057-.51-.157-.626-.384-.116-.226-.095-.538.07-.988.051-.16.012-.398-.026-.648a2.5 2.5 0 0 1-.037-.369c0-.133.022-.265.087-.386v-.002c.14-.266.368-.377.577-.451s.397-.125.53-.258c.143-.15.27-.374.443-.56q.036-.037.073-.07c-.081-.538.007-1.105.192-1.662.393-1.18 1.223-2.314 1.811-3.014.502-.713.65-1.287.701-2.016.042-.997-.705-3.974 2.112-4.2q.168-.015.321-.013m2.596 10.866-.03.016c-.223.121-.348.337-.427.656-.08.32-.107.733-.13 1.206v.001c-.023.37-.192.824-.31 1.267s-.176.862-.036 1.128v.002c.226.452.608.636 1.051.601s.947-.304 1.36-.795c.474-.576 1.218-.796 1.638-1.05.21-.126.324-.242.333-.4.009-.157-.097-.403-.425-.767-.17-.192-.217-.462-.274-.71-.056-.247-.122-.468-.26-.585l-.001-.001c-.18-.157-.356-.17-.565-.164q-.069.001-.14.005c-.239.275-.805.612-1.197.508-.359-.09-.562-.508-.587-.918m-7.204.03H3.83c-.189.002-.314.09-.44.225-.149.158-.276.382-.445.56v.002h-.002c-.183.184-.414.239-.61.31-.195.069-.353.143-.46.35v.002c-.085.155-.066.378-.029.624.038.245.096.507.018.746v.002l-.001.002c-.157.427-.155.678-.082.822.074.143.235.22.48.272.493.103 1.26.069 1.906.41.583.305 1.168.404 1.598.305.431-.098.712-.369.75-.867v-.002c.029-.292-.195-.673-.485-1.052-.29-.38-.633-.752-.795-1.09v-.002l-.61-1.11c-.21-.286-.43-.462-.68-.5a1 1 0 0 0-.106-.008M9.584 4.85c-.14.2-.386.37-.695.467-.147.048-.302.17-.495.28a1.3 1.3 0 0 1-.74.19.97.97 0 0 1-.582-.227c-.14-.113-.25-.237-.394-.322a3 3 0 0 1-.192-.126c-.063 1.179-.85 2.658-1.226 3.511a5.4 5.4 0 0 0-.43 1.917c-.68-.906-.184-2.066.081-2.568.297-.55.343-.701.27-.649-.266.436-.685 1.13-.848 1.844-.085.372-.1.749.01 1.097.11.349.345.67.766.931.573.351.963.703 1.193 1.015s.302.584.23.777a.4.4 0 0 1-.212.22.7.7 0 0 1-.307.056l.184.235c.094.124.186.249.266.375 1.179.805 2.567.496 3.568-.218.1-.342.197-.664.212-.903.024-.474.05-.896.136-1.245s.244-.634.53-.791a1 1 0 0 1 .138-.061q.005-.045.013-.087c.082-.546.569-.572 1.18-.303.588.266.81.499.71.814h.13c.122-.398-.133-.69-.822-1.025l-.137-.06a2.35 2.35 0 0 0-.012-1.113c-.188-.79-.704-1.49-1.098-1.838-.072-.003-.065.06.081.203.363.333 1.156 1.532.727 2.644a1.2 1.2 0 0 0-.342-.043c-.164-.907-.543-1.66-.735-2.014-.359-.668-.918-2.036-1.158-2.983M7.72 3.503a1 1 0 0 0-.312.053c-.268.093-.447.286-.559.391-.022.021-.05.04-.119.091s-.172.126-.321.238q-.198.151-.13.38c.046.15.192.325.459.476.166.098.28.23.41.334a1 1 0 0 0 .215.133.9.9 0 0 0 .298.066c.282.017.49-.068.673-.173s.34-.233.518-.29c.365-.115.627-.345.709-.564a.37.37 0 0 0-.01-.309c-.048-.096-.148-.187-.318-.257h-.001c-.354-.151-.507-.162-.705-.29-.321-.207-.587-.28-.807-.279m-.89-1.122h-.025a.4.4 0 0 0-.278.135.76.76 0 0 0-.191.334 1.2 1.2 0 0 0-.051.445v.001c.01.162.041.299.102.436.05.116.109.204.183.274l.089-.065.117-.09-.023-.018a.4.4 0 0 1-.11-.161.7.7 0 0 1-.054-.22v-.01a.7.7 0 0 1 .014-.234.4.4 0 0 1 .08-.179q.056-.069.126-.073h.013a.18.18 0 0 1 .123.05c.045.04.08.09.11.162a.7.7 0 0 1 .054.22v.01a.7.7 0 0 1-.002.17 1.1 1.1 0 0 1 .317-.143 1.3 1.3 0 0 0 .002-.194V3.23a1.2 1.2 0 0 0-.102-.437.8.8 0 0 0-.227-.31.4.4 0 0 0-.268-.102m1.95-.155a.63.63 0 0 0-.394.14.9.9 0 0 0-.287.376 1.2 1.2 0 0 0-.1.51v.015q0 .079.01.152c.114.027.278.074.406.138a1 1 0 0 1-.011-.172.8.8 0 0 1 .058-.278.5.5 0 0 1 .139-.2.26.26 0 0 1 .182-.069.26.26 0 0 1 .178.081c.055.054.094.12.124.21.029.086.042.17.04.27l-.002.012a.8.8 0 0 1-.057.277c-.024.059-.089.106-.122.145.046.016.09.03.146.052a5 5 0 0 1 .248.102 1.2 1.2 0 0 0 .244-.763 1.2 1.2 0 0 0-.11-.495.9.9 0 0 0-.294-.37.64.64 0 0 0-.39-.133z"></path></svg>
-            Linux
-          </button>
-          <button type="button" class="dl-os" data-os="mac" data-label="macOS" data-file="Sarala_0.4.3_universal.dmg" data-size="29.2 MB" data-href={`${DL}/Sarala_0.4.3_universal.dmg`}>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.7 2.8c.1 1-.3 2-1 2.8-.7.8-1.7 1.4-2.7 1.3-.1-1 .4-2 1-2.7.7-.8 1.8-1.3 2.7-1.4ZM19 17c-.5 1.2-.8 1.7-1.5 2.7-1 1.4-2.4 3.1-4.1 3.1-1.5 0-1.9-1-3.9-1-2 0-2.5 1-4 1-1.7 0-3-1.6-4-3C-.3 16.6-.6 11 1.7 8.3c1-1.3 2.6-2.1 4.1-2.1 1.6 0 2.6 1 3.9 1 1.3 0 2-1 3.9-1 1.4 0 2.9.8 3.9 2.1-3.4 1.9-2.9 6.8 1.6 8.7Z"></path></svg>
-            macOS
-          </button>
-          <button type="button" class="dl-os" data-os="win" data-label="Windows" data-file="Sarala_0.4.3_x64-setup.exe" data-size="12.9 MB" data-href={`${DL}/Sarala_0.4.3_x64-setup.exe`}>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3.9 10.5 2.9v8.1H3V3.9ZM11.5 2.8 21 1.5V11H11.5V2.8ZM3 12.9h7.5V21L3 20V12.9ZM11.5 13H21v9.5L11.5 21.2V13Z"></path></svg>
-            Windows
-          </button>
-        </div>
+              <span class="dl-thumb" id="dl-thumb" aria-hidden="true"></span>
+              <button type="button" class="dl-os" data-os="linux" data-label="Linux" data-file={BUILDS.linux.file} data-size={BUILDS.linux.size} data-href={`${DL}/${BUILDS.linux.file}`} role="tab" aria-selected="false">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8.996 4.497c.104-.076.1-.168.186-.158s.022.102-.098.207c-.12.104-.308.243-.46.323-.291.152-.631.336-.993.336s-.647-.167-.853-.33c-.102-.082-.186-.162-.248-.221-.11-.086-.096-.207-.052-.204.075.01.087.109.134.153.064.06.144.137.241.214.195.154.454.304.778.304s.702-.19.932-.32c.13-.073.297-.204.433-.304M7.34 3.781c.055-.02.123-.031.174-.003.011.006.024.021.02.034-.012.038-.074.032-.11.05-.032.017-.057.052-.093.054-.034 0-.086-.012-.09-.046-.007-.044.058-.072.1-.089m.581-.003c.05-.028.119-.018.173.003.041.017.106.045.1.09-.004.033-.057.046-.09.045-.036-.002-.062-.037-.093-.053-.036-.019-.098-.013-.11-.051-.004-.013.008-.028.02-.034"></path><path fill-rule="evenodd" d="M8.446.019c2.521.003 2.38 2.66 2.364 4.093-.01.939.509 1.574 1.04 2.244.474.56 1.095 1.38 1.45 2.32.29.765.402 1.613.115 2.465a.8.8 0 0 1 .254.152l.001.002c.207.175.271.447.329.698.058.252.112.488.224.615.344.382.494.667.48.922-.015.254-.203.43-.435.57-.465.28-1.164.491-1.586 1.002-.443.527-.99.83-1.505.871a1.25 1.25 0 0 1-1.256-.716v-.001a1 1 0 0 1-.078-.21c-.67.038-1.252-.165-1.718-.128-.687.038-1.116.204-1.506.206-.151.331-.445.547-.808.63-.5.114-1.126 0-1.743-.324-.577-.306-1.31-.278-1.85-.39-.27-.057-.51-.157-.626-.384-.116-.226-.095-.538.07-.988.051-.16.012-.398-.026-.648a2.5 2.5 0 0 1-.037-.369c0-.133.022-.265.087-.386v-.002c.14-.266.368-.377.577-.451s.397-.125.53-.258c.143-.15.27-.374.443-.56q.036-.037.073-.07c-.081-.538.007-1.105.192-1.662.393-1.18 1.223-2.314 1.811-3.014.502-.713.65-1.287.701-2.016.042-.997-.705-3.974 2.112-4.2q.168-.015.321-.013m2.596 10.866-.03.016c-.223.121-.348.337-.427.656-.08.32-.107.733-.13 1.206v.001c-.023.37-.192.824-.31 1.267s-.176.862-.036 1.128v.002c.226.452.608.636 1.051.601s.947-.304 1.36-.795c.474-.576 1.218-.796 1.638-1.05.21-.126.324-.242.333-.4.009-.157-.097-.403-.425-.767-.17-.192-.217-.462-.274-.71-.056-.247-.122-.468-.26-.585l-.001-.001c-.18-.157-.356-.17-.565-.164q-.069.001-.14.005c-.239.275-.805.612-1.197.508-.359-.09-.562-.508-.587-.918m-7.204.03H3.83c-.189.002-.314.09-.44.225-.149.158-.276.382-.445.56v.002h-.002c-.183.184-.414.239-.61.31-.195.069-.353.143-.46.35v.002c-.085.155-.066.378-.029.624.038.245.096.507.018.746v.002l-.001.002c-.157.427-.155.678-.082.822.074.143.235.22.48.272.493.103 1.26.069 1.906.41.583.305 1.168.404 1.598.305.431-.098.712-.369.75-.867v-.002c.029-.292-.195-.673-.485-1.052-.29-.38-.633-.752-.795-1.09v-.002l-.61-1.11c-.21-.286-.43-.462-.68-.5a1 1 0 0 0-.106-.008M9.584 4.85c-.14.2-.386.37-.695.467-.147.048-.302.17-.495.28a1.3 1.3 0 0 1-.74.19.97.97 0 0 1-.582-.227c-.14-.113-.25-.237-.394-.322a3 3 0 0 1-.192-.126c-.063 1.179-.85 2.658-1.226 3.511a5.4 5.4 0 0 0-.43 1.917c-.68-.906-.184-2.066.081-2.568.297-.55.343-.701.27-.649-.266.436-.685 1.13-.848 1.844-.085.372-.1.749.01 1.097.11.349.345.67.766.931.573.351.963.703 1.193 1.015s.302.584.23.777a.4.4 0 0 1-.212.22.7.7 0 0 1-.307.056l.184.235c.094.124.186.249.266.375 1.179.805 2.567.496 3.568-.218.1-.342.197-.664.212-.903.024-.474.05-.896.136-1.245s.244-.634.53-.791a1 1 0 0 1 .138-.061q.005-.045.013-.087c.082-.546.569-.572 1.18-.303.588.266.81.499.71.814h.13c.122-.398-.133-.69-.822-1.025l-.137-.06a2.35 2.35 0 0 0-.012-1.113c-.188-.79-.704-1.49-1.098-1.838-.072-.003-.065.06.081.203.363.333 1.156 1.532.727 2.644a1.2 1.2 0 0 0-.342-.043c-.164-.907-.543-1.66-.735-2.014-.359-.668-.918-2.036-1.158-2.983M7.72 3.503a1 1 0 0 0-.312.053c-.268.093-.447.286-.559.391-.022.021-.05.04-.119.091s-.172.126-.321.238q-.198.151-.13.38c.046.15.192.325.459.476.166.098.28.23.41.334a1 1 0 0 0 .215.133.9.9 0 0 0 .298.066c.282.017.49-.068.673-.173s.34-.233.518-.29c.365-.115.627-.345.709-.564a.37.37 0 0 0-.01-.309c-.048-.096-.148-.187-.318-.257h-.001c-.354-.151-.507-.162-.705-.29-.321-.207-.587-.28-.807-.279m-.89-1.122h-.025a.4.4 0 0 0-.278.135.76.76 0 0 0-.191.334 1.2 1.2 0 0 0-.051.445v.001c.01.162.041.299.102.436.05.116.109.204.183.274l.089-.065.117-.09-.023-.018a.4.4 0 0 1-.11-.161.7.7 0 0 1-.054-.22v-.01a.7.7 0 0 1 .014-.234.4.4 0 0 1 .08-.179q.056-.069.126-.073h.013a.18.18 0 0 1 .123.05c.045.04.08.09.11.162a.7.7 0 0 1 .054.22v.01a.7.7 0 0 1-.002.17 1.1 1.1 0 0 1 .317-.143 1.3 1.3 0 0 0 .002-.194V3.23a1.2 1.2 0 0 0-.102-.437.8.8 0 0 0-.227-.31.4.4 0 0 0-.268-.102m1.95-.155a.63.63 0 0 0-.394.14.9.9 0 0 0-.287.376 1.2 1.2 0 0 0-.1.51v.015q0 .079.01.152c.114.027.278.074.406.138a1 1 0 0 1-.011-.172.8.8 0 0 1 .058-.278.5.5 0 0 1 .139-.2.26.26 0 0 1 .182-.069.26.26 0 0 1 .178.081c.055.054.094.12.124.21.029.086.042.17.04.27l-.002.012a.8.8 0 0 1-.057.277c-.024.059-.089.106-.122.145.046.016.09.03.146.052a5 5 0 0 1 .248.102 1.2 1.2 0 0 0 .244-.763 1.2 1.2 0 0 0-.11-.495.9.9 0 0 0-.294-.37.64.64 0 0 0-.39-.133z"></path></svg>
+                Linux
+              </button>
+              <button type="button" class="dl-os" data-os="mac" data-label="macOS" data-file={BUILDS.mac.file} data-size={BUILDS.mac.size} data-href={`${DL}/${BUILDS.mac.file}`} role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.7 2.8c.1 1-.3 2-1 2.8-.7.8-1.7 1.4-2.7 1.3-.1-1 .4-2 1-2.7.7-.8 1.8-1.3 2.7-1.4ZM19 17c-.5 1.2-.8 1.7-1.5 2.7-1 1.4-2.4 3.1-4.1 3.1-1.5 0-1.9-1-3.9-1-2 0-2.5 1-4 1-1.7 0-3-1.6-4-3C-.3 16.6-.6 11 1.7 8.3c1-1.3 2.6-2.1 4.1-2.1 1.6 0 2.6 1 3.9 1 1.3 0 2-1 3.9-1 1.4 0 2.9.8 3.9 2.1-3.4 1.9-2.9 6.8 1.6 8.7Z"></path></svg>
+                macOS
+              </button>
+              <button type="button" class="dl-os" data-os="win" data-label="Windows" data-file={BUILDS.win.file} data-size={BUILDS.win.size} data-href={`${DL}/${BUILDS.win.file}`} role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3.9 10.5 2.9v8.1H3V3.9ZM11.5 2.8 21 1.5V11H11.5V2.8ZM3 12.9h7.5V21L3 20V12.9ZM11.5 13H21v9.5L11.5 21.2V13Z"></path></svg>
+                Windows
+              </button>
+            </div>
 
             <div>
-          <a class="btn btn-primary dl-cta" id="dl-cta" href={`${DL}/Sarala_0.4.3_universal.dmg`} download>
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg>
-            <span id="dl-cta-label">Download for macOS</span>
-          </a>
-          <p class="dl-meta"><span id="dl-file">Sarala_0.4.3_universal.dmg</span> · <span id="dl-size">29.2 MB</span> · <b>v{VERSION}</b></p>
+              <a class="btn btn-primary dl-cta" id="dl-cta" href={`${DL}/${BUILDS.mac.file}`} data-magnetic download>
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                <span id="dl-cta-label">Download for macOS</span>
+              </a>
+              <p class="dl-meta"><span id="dl-file">{BUILDS.mac.file}</span> · <span id="dl-size">{BUILDS.mac.size}</span> · <b>v{VERSION}</b></p>
 
-          <div class="dl-alt dl-distros" data-os="linux">
-            <a class="dl-distro" href={`${DL}/Sarala_0.4.3_amd64.deb`} download>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.3" fill="none" stroke="#E95420" stroke-width="1.8"></circle><circle cx="12" cy="3.6" r="2.1" fill="#E95420"></circle><circle cx="4.6" cy="16.2" r="2.1" fill="#E95420"></circle><circle cx="19.4" cy="16.2" r="2.1" fill="#E95420"></circle><circle cx="12" cy="12" r="2" fill="#E95420"></circle></svg>
-              <span>Ubuntu <em>.deb</em></span>
-            </a>
-            <a class="dl-distro" href={`${DL}/Sarala_0.4.3_amd64.deb`} download>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#D70A53" stroke-width="1.8" stroke-linecap="round" d="M14.6 5.1A8 8 0 1 0 19 13.6 5.6 5.6 0 1 1 12.9 7.7 3.2 3.2 0 1 0 11 13.1"></path></svg>
-              <span>Debian <em>.deb</em></span>
-            </a>
-            <a class="dl-distro" href={`${DL}/Sarala-0.4.3-1.x86_64.rpm`} download>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#3C6EB4"></circle><path fill="#fff" d="M14 6.4c-1.9 0-3.3 1.2-3.3 3.2v1.2H9v2.2h1.7V18H13v-5h2v-2.2h-2V9.7c0-.7.4-1.1 1.1-1.1h1V6.5c-.4-.1-.8-.1-1.1-.1Z"></path></svg>
-              <span>Fedora <em>.rpm</em></span>
-            </a>
-            <a class="dl-distro" href={SNAP} target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#4A9E8F" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5V8Z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>
-              <span>Snap <em>store</em></span>
-            </a>
-          </div>
-          <div class="dl-alt" data-os="mac">universal build — Apple&nbsp;Silicon &amp; Intel</div>
-          <div class="dl-alt" data-os="win">also: <a href={`${DL}/Sarala_0.4.3_x64_en-US.msi`}>.msi installer</a></div>
+              <div class="dl-alt dl-distros" data-os="linux">
+                <a class="dl-distro" href={`${DL}/${ALT.deb}`} download>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.3" fill="none" stroke="#E95420" stroke-width="1.8"></circle><circle cx="12" cy="3.6" r="2.1" fill="#E95420"></circle><circle cx="4.6" cy="16.2" r="2.1" fill="#E95420"></circle><circle cx="19.4" cy="16.2" r="2.1" fill="#E95420"></circle><circle cx="12" cy="12" r="2" fill="#E95420"></circle></svg>
+                  <span>Ubuntu <em>.deb</em></span>
+                </a>
+                <a class="dl-distro" href={`${DL}/${ALT.deb}`} download>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#D70A53" stroke-width="1.8" stroke-linecap="round" d="M14.6 5.1A8 8 0 1 0 19 13.6 5.6 5.6 0 1 1 12.9 7.7 3.2 3.2 0 1 0 11 13.1"></path></svg>
+                  <span>Debian <em>.deb</em></span>
+                </a>
+                <a class="dl-distro" href={`${DL}/${ALT.rpm}`} download>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#3C6EB4"></circle><path fill="#fff" d="M14 6.4c-1.9 0-3.3 1.2-3.3 3.2v1.2H9v2.2h1.7V18H13v-5h2v-2.2h-2V9.7c0-.7.4-1.1 1.1-1.1h1V6.5c-.4-.1-.8-.1-1.1-.1Z"></path></svg>
+                  <span>Fedora <em>.rpm</em></span>
+                </a>
+                <a class="dl-distro" href={SNAP} target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#4A9E8F" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5V8Z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>
+                  <span>Snap <em>store</em></span>
+                </a>
+              </div>
+              <div class="dl-alt" data-os="mac">universal build, Apple&nbsp;Silicon &amp; Intel</div>
+              <div class="dl-alt" data-os="win">also: <a href={`${DL}/${ALT.msi}`}>.msi installer</a></div>
 
-          <div>
-            <a class="dl-all" href={RELEASES} target="_blank" rel="noopener">
-              All releases &amp; checksums
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>
-            </a>
-          </div>
+              <!-- ---- macOS Gatekeeper: first-launch guide (macOS only) ---- -->
+              <div class="dl-alt gk" data-os="mac" id="macos-first-launch" aria-labelledby="gk-title">
+                <div class="gk-top">
+                  <span class="gk-sigil" aria-hidden="true">
+                    <span class="gk-sigil-ring"></span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2.4"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path><circle cx="12" cy="15.2" r="1.15" fill="currentColor" stroke="none"></circle></svg>
+                  </span>
+                  <div class="gk-titles">
+                    <h3 id="gk-title">Opening Sarala the first time</h3>
+                    <p>macOS blocks apps that Apple hasn&rsquo;t notarized. Clearing it takes about ten seconds, and you only do it once.</p>
+                  </div>
+                </div>
+
+                <div class="gk-tabs" id="gk-tabs" role="tablist" aria-label="Ways to open Sarala the first time">
+                  <span class="gk-thumb" id="gk-thumb" aria-hidden="true"></span>
+                  <button type="button" class="gk-tab on" id="gk-tab-cmd" role="tab" aria-selected="true" aria-controls="gk-panel-cmd" data-gk-tab="cmd">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 4 4-4 4"></path><path d="M12.5 16H19"></path></svg>
+                    <span class="gk-tab-name">One command</span>
+                    <span class="gk-tab-hint">fastest</span>
+                  </button>
+                  <button type="button" class="gk-tab" id="gk-tab-gui" role="tab" aria-selected="false" aria-controls="gk-panel-gui" data-gk-tab="gui" tabindex="-1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 3 6.5 16 2-6.5L20 10.5Z"></path></svg>
+                    <span class="gk-tab-name">No Terminal</span>
+                    <span class="gk-tab-hint">clicks only</span>
+                  </button>
+                </div>
+
+                <div class="gk-stage" id="gk-stage">
+                  <!-- ---- method 1: one command ---- -->
+                  <div class="gk-panel on" id="gk-panel-cmd" role="tabpanel" aria-labelledby="gk-tab-cmd" data-gk-panel="cmd">
+                    <ol class="gk-steps">
+                      <li class="gk-step">
+                        <span class="gk-dot" aria-hidden="true">1</span>
+                        <div class="gk-step-body">
+                          <h4>Put Sarala in Applications</h4>
+                          <p>Open the downloaded <code>.dmg</code> and drag the Sarala icon onto the Applications folder.</p>
+                        </div>
+                      </li>
+                      <li class="gk-step">
+                        <span class="gk-dot" aria-hidden="true">2</span>
+                        <div class="gk-step-body">
+                          <h4>Run this line once</h4>
+                          <p>Press <kbd>⌘</kbd><kbd>Space</kbd>, type <b>Terminal</b>, then paste the command below and hit Return.</p>
+
+                          <figure class="gk-term">
+                            <figcaption class="gk-term-bar">
+                              <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+                              <span class="gk-term-title">Terminal</span>
+                            </figcaption>
+                            <div class="gk-term-body">
+                              <span class="gk-prompt" aria-hidden="true">$</span>
+                              <code id="gk-cmd">{QUARANTINE_CMD}</code>
+                              <span class="gk-sweep" aria-hidden="true"></span>
+                            </div>
+                            <button type="button" class="gk-copy" data-copy="#gk-cmd" data-copied-label="Copied to clipboard">
+                              <span class="gk-copy-icons" aria-hidden="true">
+                                <svg class="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+                                <svg class="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
+                              </span>
+                              <span class="gk-copy-label">Copy command</span>
+                            </button>
+                          </figure>
+
+                          <p class="gk-fine">It clears the &ldquo;downloaded from the internet&rdquo; quarantine flag on Sarala, and nothing else on your Mac.</p>
+                        </div>
+                      </li>
+                      <li class="gk-step">
+                        <span class="gk-dot" aria-hidden="true">3</span>
+                        <div class="gk-step-body">
+                          <h4>Open Sarala</h4>
+                          <p>Launch it from Applications. Every launch after this one is normal.</p>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+
+                  <!-- ---- method 2: no Terminal ---- -->
+                  <div class="gk-panel" id="gk-panel-gui" role="tabpanel" aria-labelledby="gk-tab-gui" data-gk-panel="gui" hidden>
+                    <div class="gk-vers" id="gk-vers" aria-label="Your macOS version">
+                      <span class="gk-vthumb" id="gk-vthumb" aria-hidden="true"></span>
+                      <button type="button" class="gk-ver on" data-gk-ver="new" aria-pressed="true">Sequoia&nbsp;15 or newer</button>
+                      <button type="button" class="gk-ver" data-gk-ver="old" aria-pressed="false">Sonoma&nbsp;14 or older</button>
+                    </div>
+
+                    <div class="gk-verstage" id="gk-verstage">
+                      <ol class="gk-steps" data-gk-verpanel="new">
+                        <li class="gk-step">
+                          <span class="gk-dot" aria-hidden="true">1</span>
+                          <div class="gk-step-body">
+                            <h4>Try to open it</h4>
+                            <p>Double-click <b>Sarala</b> in Applications. macOS refuses and shows a warning, so click <b>Done</b>.</p>
+                          </div>
+                        </li>
+                        <li class="gk-step">
+                          <span class="gk-dot" aria-hidden="true">2</span>
+                          <div class="gk-step-body">
+                            <h4>Open Privacy &amp; Security</h4>
+                            <p>Apple&nbsp;menu <span class="gk-arrow" aria-hidden="true">&rsaquo;</span> <b>System Settings</b> <span class="gk-arrow" aria-hidden="true">&rsaquo;</span> <b>Privacy &amp; Security</b>, then scroll down to the <b>Security</b> section.</p>
+                          </div>
+                        </li>
+                        <li class="gk-step">
+                          <span class="gk-dot" aria-hidden="true">3</span>
+                          <div class="gk-step-body">
+                            <h4>Click Open Anyway</h4>
+                            <p>It sits next to &ldquo;Sarala was blocked&hellip;&rdquo;. Confirm with Touch&nbsp;ID or your password and Sarala launches.</p>
+                          </div>
+                        </li>
+                      </ol>
+
+                      <ol class="gk-steps" data-gk-verpanel="old" hidden>
+                        <li class="gk-step">
+                          <span class="gk-dot" aria-hidden="true">1</span>
+                          <div class="gk-step-body">
+                            <h4>Right-click the app</h4>
+                            <p>In Applications, right-click (or Control-click) <b>Sarala</b>.</p>
+                          </div>
+                        </li>
+                        <li class="gk-step">
+                          <span class="gk-dot" aria-hidden="true">2</span>
+                          <div class="gk-step-body">
+                            <h4>Choose Open, twice</h4>
+                            <p>Pick <b>Open</b> from the menu, then <b>Open</b> again in the dialog that appears.</p>
+                          </div>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="gk-note">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5.5"></path><path d="M12 7.6v.1"></path></svg>
+                  <p><b>Seeing &ldquo;Sarala is damaged and can&rsquo;t be opened&rdquo;?</b> Your download is fine. That is simply how Gatekeeper describes an un-notarized app on Apple&nbsp;Silicon, and either method above clears it.</p>
+                </div>
+
+                <p class="gk-copy-status" id="gk-copy-status" role="status" aria-live="polite"></p>
+
+                <p class="gk-why">
+                  Notarization needs a paid Apple Developer account. Sarala is free and open source, so you can
+                  <a href={RELEASES} target="_blank" rel="noopener">verify the release checksums</a> or
+                  <a href={GITHUB} target="_blank" rel="noopener">build it from source</a> instead of taking our word for it.
+                </p>
+              </div>
+
+              <div>
+                <a class="dl-all" href={RELEASES} target="_blank" rel="noopener">
+                  All releases &amp; checksums
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
+
   </main>
 
   <!-- ============ FOOTER ============ -->

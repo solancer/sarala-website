@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { VERSION, GITHUB as REPO } from "../consts";
 
 export interface Props {
   title?: string;
@@ -19,7 +20,6 @@ const {
 const siteUrl = Astro.site ?? new URL("https://sarala.solancer.com");
 const canonical = new URL(path, siteUrl).href;
 const ogImageAbs = new URL(ogImage, siteUrl).href;
-const GITHUB = "https://github.com/solancer/sarala";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -30,7 +30,7 @@ const jsonLd = {
   operatingSystem: "macOS, Windows, Linux",
   description,
   url: siteUrl.href,
-  downloadUrl: `${GITHUB}/releases`,
+  downloadUrl: `${REPO}/releases`,
   license: "https://www.gnu.org/licenses/gpl-3.0.html",
   isAccessibleForFree: true,
   offers: {
@@ -38,7 +38,7 @@ const jsonLd = {
     price: "0",
     priceCurrency: "USD",
   },
-  softwareVersion: "2.0",
+  softwareVersion: VERSION,
   author: {
     "@type": "Person",
     name: "Srinivas Gowda",
@@ -110,5 +110,15 @@ const jsonLd = {
   <body>
     <slot />
     <script src="../scripts/app.js"></script>
+    <script src="../scripts/motion.js"></script>
+    <script is:inline>
+      // Scroll-reveal content starts hidden and is animated in by the motion
+      // module. If that module never runs (old browser, blocked bundle), show
+      // everything rather than leaving the page blank.
+      setTimeout(function () {
+        var r = document.documentElement;
+        if (!r.classList.contains("mo")) r.classList.add("mo-fallback");
+      }, 2500);
+    </script>
   </body>
 </html>

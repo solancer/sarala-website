@@ -28,7 +28,7 @@ const {
 const site = Astro.site ?? new URL("https://sarala.solancer.com");
 const canonical = new URL(path, site).href;
 const ogImageAbs = new URL(ogImage, site).href;
-const shot = (name: string) => new URL(`/screenshots/shots/${name}.webp`, site).href;
+const shot = (name: string) => new URL(`/screenshots/crops/${name}.webp`, site).href;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -59,7 +59,7 @@ const jsonLd = {
       isAccessibleForFree: true,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       image: ogImageAbs,
-      screenshot: ["live-editor", "diagrams", "math", "ai-assistant", "voice-typing"].map(shot),
+      screenshot: ["hero-light", "win-diagrams", "win-math", "win-ai-assistant", "win-voice-typing"].map(shot),
       featureList: [
         "Live WYSIWYG Markdown rendering without a preview pane",
         "Mermaid and D2 diagrams",

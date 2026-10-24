@@ -234,7 +234,7 @@ const faqLd = {
             <div class="panel" role="tabpanel" id={`panel-${s.id}`} aria-labelledby={`tab-${s.id}`} hidden={i !== 0}>
               <figure class="shot">
                 <button type="button" data-zoom aria-label={`Enlarge screenshot: ${s.title}`}>
-                  <img src={`/screenshots/shots/${s.img}.webp`} alt={s.alt} width="1680" height="1125" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+                  <img src={`/screenshots/crops/win-${s.img}.webp`} alt={s.alt} width="1452" height="900" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
                 </button>
               </figure>
               <div>
@@ -266,7 +266,7 @@ const faqLd = {
         </div>
         <figure class="shot reveal">
           <button type="button" data-zoom aria-label="Enlarge screenshot: the AI assistant proposing edits">
-            <img src="/screenshots/shots/ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1680" height="1125" loading="lazy" decoding="async" />
+            <img src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1452" height="900" loading="lazy" decoding="async" />
           </button>
           <figcaption>Proposed changes appear as diffs, block by block.</figcaption>
         </figure>
@@ -290,8 +290,9 @@ const faqLd = {
         </div>
         <figure class="shot reveal">
           <button type="button" data-zoom aria-label="Enlarge screenshot: voice typing">
-            <img src="/screenshots/shots/voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1680" height="1125" loading="lazy" decoding="async" />
+            <img src="/screenshots/crops/win-voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1452" height="900" loading="lazy" decoding="async" />
           </button>
+          <img class="shot-pill" src="/screenshots/crops/voice-pill.webp" alt="" width="248" height="56" loading="lazy" decoding="async" />
           <figcaption>Words appear as you speak, with no internet connection needed.</figcaption>
         </figure>
       </div>

@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import VoicePill from "../components/VoicePill.astro";
-import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, MAC_APP_PATH } from "../consts";
+import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, ALT_SIZE, MAC_APP_PATH } from "../consts";
 
 const LICENSE = `${GITHUB}/blob/main/LICENSE`;
 const ISSUES = `${GITHUB}/issues`;
@@ -66,28 +66,28 @@ const SHOWCASE = [
     alt: "A Mermaid flowchart of a Kubernetes request path, rendered inline in a Sarala document",
     title: "Mermaid and D2 diagrams",
     text: "Flowcharts, sequence diagrams and architecture maps render right in the page and follow your theme. Click a diagram to edit its source.",
-    code: "```mermaid\nflowchart LR\n  user --> ingress --> service\n```",
+    code: "<span class=\"c-f\">```</span><span class=\"c-l\">mermaid</span>\nflowchart LR\n  user <span class=\"c-o\">--></span> ingress <span class=\"c-o\">--></span> service\n<span class=\"c-f\">```</span>",
   },
   {
     id: "math", label: "Math", icon: "sigma" as const, img: "math",
     alt: "Queueing-theory equations typeset with KaTeX in Sarala",
     title: "LaTeX math, typeset as you write",
     text: "Inline and display equations render with KaTeX, with optional equation numbering and references.",
-    code: "$$\nW = \\frac{1}{\\mu - \\lambda}\n$$",
+    code: "<span class=\"c-f\">$$</span>\nW = <span class=\"c-k\">\\frac</span>{1}{<span class=\"c-k\">\\mu</span> - <span class=\"c-k\">\\lambda</span>}\n<span class=\"c-f\">$$</span>",
   },
   {
     id: "code", label: "Code", icon: "code" as const, img: "code",
     alt: "A syntax-highlighted Java Kafka producer in Sarala's Night theme, with the document outline beside it",
     title: "Code blocks with real highlighting",
     text: "Fenced code is highlighted for more than 100 languages, using colours from your theme.",
-    code: "```java\nproducer.send(record);\n```",
+    code: "<span class=\"c-f\">```</span><span class=\"c-l\">java</span>\nproducer.<span class=\"c-k\">send</span>(record);\n<span class=\"c-f\">```</span>",
   },
   {
     id: "tables", label: "Tables & tasks", icon: "table" as const, img: "tables",
     alt: "A settings table, a rollout checklist and a warning callout in Sarala's GitHub theme",
     title: "Tables, task lists and callouts",
     text: "Edit tables cell by cell, tick tasks with a click, and use GitHub-style callouts for notes and warnings.",
-    code: "| Setting | Value |\n| :-- | --: |\n- [x] Readiness probe\n> [!WARNING]",
+    code: "<span class=\"c-o\">|</span> Setting <span class=\"c-o\">|</span> Value <span class=\"c-o\">|</span>\n<span class=\"c-o\">| :-- | --: |</span>\n<span class=\"c-f\">- [x]</span> Readiness probe\n<span class=\"c-f\">&gt;</span> <span class=\"c-l\">[!WARNING]</span>",
   },
 
 ];
@@ -101,6 +101,44 @@ const THEMES = [
   { id: "machine", dot: "#7cd5f1", name: "Machine", sub: "Teal graphite", bg: "#273136", border: "#3a464b", fg: "#f2fffc", accent: "#ff6d7e", on: "#273136", sw: ["#ff6d7e", "#ffb270", "#ffed72", "#a2e57b", "#7cd5f1", "#baa0f8"] },
   { id: "ristretto", dot: "#f9cc6c", name: "Ristretto", sub: "Espresso brown", bg: "#2c2525", border: "#403838", fg: "#fff1f3", accent: "#fd6883", on: "#2c2525", sw: ["#fd6883", "#f38d70", "#f9cc6c", "#adda78", "#85dacc", "#a8a9eb"] },
   { id: "spectrum", dot: "#948ae3", name: "Spectrum", sub: "Neutral black", bg: "#222222", border: "#363636", fg: "#f7f1ff", accent: "#fc618d", on: "#222222", sw: ["#fc618d", "#fd9353", "#fce566", "#7bd88f", "#5ad4e6", "#948ae3"] },
+];
+
+const OS_ICON = {
+  mac: '<path fill="currentColor" stroke="none" d="M16.7 2.8c.1 1-.3 2-1 2.8-.7.8-1.7 1.4-2.7 1.3-.1-1 .4-2 1-2.7.7-.8 1.8-1.3 2.7-1.4ZM19 17c-.5 1.2-.8 1.7-1.5 2.7-1 1.4-2.4 3.1-4.1 3.1-1.5 0-1.9-1-3.9-1-2 0-2.5 1-4 1-1.7 0-3-1.6-4-3C-.3 16.6-.6 11 1.7 8.3c1-1.3 2.6-2.1 4.1-2.1 1.6 0 2.6 1 3.9 1 1.3 0 2-1 3.9-1 1.4 0 2.9.8 3.9 2.1-3.4 1.9-2.9 6.8 1.6 8.7Z"/>',
+  win: '<path fill="currentColor" stroke="none" d="M3 3.9 10.5 2.9v8.1H3V3.9ZM11.5 2.8 21 1.5V11H11.5V2.8ZM3 12.9h7.5V21L3 20V12.9ZM11.5 13H21v9.5L11.5 21.2V13Z"/>',
+  linux: '<path fill="currentColor" stroke="none" d="M12 2c-2.2 0-3.4 1.8-3.4 4.1 0 1.4.4 2.4-.4 3.6-.9 1.3-2.9 3.6-2.9 6.4 0 .9.2 1.7.6 2.4-.8.4-1.7.8-1.7 1.6 0 1 1.7 1.3 3.3 1.6 1.2.2 2 .6 3 .6 1.1 0 1.6-.7 2-.7s1 .7 2 .7c1 0 1.9-.4 3.1-.6 1.6-.3 3.2-.6 3.2-1.6 0-.8-.9-1.2-1.7-1.6.4-.7.6-1.5.6-2.4 0-2.8-2-5.1-2.9-6.4-.8-1.2-.4-2.2-.4-3.6C15.4 3.8 14.2 2 12 2Z"/>',
+};
+const osSvg = (k: keyof typeof OS_ICON) => `<svg viewBox="0 0 24 24" aria-hidden="true">${OS_ICON[k]}</svg>`;
+
+/** One card per platform; the visitor's own is highlighted by app.js. */
+const PLATFORMS = [
+  {
+    key: "mac" as const, label: "macOS", req: "Apple Silicon and Intel · macOS 10.15 or later",
+    cta: "Download .dmg", build: BUILDS.mac,
+    alts: [{ label: "Install with Homebrew", href: "#help-mac", note: "" }],
+  },
+  {
+    key: "win" as const, label: "Windows", req: "Windows 10 and 11 · 64-bit",
+    cta: "Download installer", build: BUILDS.win,
+    alts: [{ label: ".msi", href: `${DL}/${ALT.msi}`, note: ALT_SIZE.msi }],
+  },
+  {
+    key: "linux" as const, label: "Linux", req: "64-bit · Ubuntu, Debian, Fedora and more",
+    cta: "Download AppImage", build: BUILDS.linux,
+    alts: [
+      { label: ".deb", href: `${DL}/${ALT.deb}`, note: ALT_SIZE.deb },
+      { label: ".rpm", href: `${DL}/${ALT.rpm}`, note: ALT_SIZE.rpm },
+      { label: "Snap", href: SNAP, note: "" },
+    ],
+  },
+];
+
+/** Linux one-liners, per package format. */
+const LINUX_CMDS = [
+  { id: "lx-appimage", label: "AppImage (any distribution)", cmd: `chmod +x ${BUILDS.linux.file} && ./${BUILDS.linux.file}` },
+  { id: "lx-deb", label: "Ubuntu, Debian, Mint", cmd: `sudo apt install ./${ALT.deb}` },
+  { id: "lx-rpm", label: "Fedora, RHEL, openSUSE", cmd: `sudo dnf install ./${ALT.rpm}` },
+  { id: "lx-snap", label: "Snap Store", cmd: "sudo snap install sarala" },
 ];
 
 /** Shown on the page and emitted as FAQPage structured data (answers as plain text). */
@@ -188,9 +226,9 @@ const faqLd = {
              studio backdrop, with hand-written notes pointing at what's new. -->
         <figure class="stage" aria-label="Screenshots of the Sarala desktop app">
           <div class="stage-panel">
-            <img class="win win-left" src="/screenshots/crops/win-diagrams.webp" alt="A Kubernetes architecture note with a Mermaid flowchart rendered inline" width="1452" height="900" loading="eager" decoding="async" />
-            <img class="win win-right" src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing edits to a runbook as diffs with Accept and Reject" width="1452" height="900" loading="eager" decoding="async" />
-            <img class="win win-front" src="/screenshots/crops/hero-light.webp" alt="Sarala's live editor: a Markdown document with a callout, a table and a task list, rendered as you type" width="1452" height="900" fetchpriority="high" decoding="async" />
+            <img class="win win-left" src="/screenshots/crops/win-diagrams.webp" alt="A Kubernetes architecture note with a Mermaid flowchart rendered inline" width="1459" height="906" loading="eager" decoding="async" />
+            <img class="win win-right" src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing edits to a runbook as diffs with Accept and Reject" width="1459" height="906" loading="eager" decoding="async" />
+            <img class="win win-front" src="/screenshots/crops/hero-light.webp" alt="Sarala's live editor: a Markdown document with a callout, a table and a task list, rendered as you type" width="1459" height="906" fetchpriority="high" decoding="async" />
             <VoicePill class="f-voice" />
 
             <span class="note note-front">diagrams from plain text<Fragment set:html={`<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 10c30 2 62 14 92 46"/><path d="M84 52l15 6-3-16"/></svg>`} /></span>
@@ -228,13 +266,18 @@ const faqLd = {
             <div class="panel" role="tabpanel" id={`panel-${s.id}`} aria-labelledby={`tab-${s.id}`} hidden={i !== 0}>
               <figure class="shot">
                 <button type="button" data-zoom aria-label={`Enlarge screenshot: ${s.title}`}>
-                  <img src={`/screenshots/crops/win-${s.img}.webp`} alt={s.alt} width="1452" height="900" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+                  <img src={`/screenshots/crops/win-${s.img}.webp`} alt={s.alt} width="1459" height="906" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
                 </button>
               </figure>
-              <div>
+              <div class="panel-card">
+                <span class="ti" set:html={svg(s.icon)} />
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
-                <p class="you-type">You type<code>{s.code}</code></p>
+                <div class="md-card">
+                  <div class="md-head"><span>You type</span><span class="md-file">notes.md</span></div>
+                  <pre><code set:html={s.code} /></pre>
+                  <div class="md-foot"><Fragment set:html={svg("arrow")} />Sarala renders it as shown</div>
+                </div>
               </div>
             </div>
           ))}
@@ -254,7 +297,7 @@ const faqLd = {
           <article class="duo-card reveal">
             <figure class="shot">
               <button type="button" data-zoom aria-label="Enlarge screenshot: the AI assistant proposing edits">
-                <img src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1452" height="900" loading="lazy" decoding="async" />
+                <img src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1459" height="906" loading="lazy" decoding="async" />
               </button>
             </figure>
             <h3>AI assistant</h3>
@@ -269,7 +312,7 @@ const faqLd = {
           <article class="duo-card reveal" id="voice">
             <figure class="shot">
               <button type="button" data-zoom aria-label="Enlarge screenshot: voice typing">
-                <img src="/screenshots/crops/win-voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1452" height="900" loading="lazy" decoding="async" />
+                <img src="/screenshots/crops/win-voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1459" height="906" loading="lazy" decoding="async" />
               </button>
               <VoicePill class="shot-pill" />
             </figure>
@@ -298,19 +341,19 @@ const faqLd = {
           <div class="flow-list" role="tablist" aria-orientation="vertical" aria-label="Writing features">
             <button type="button" class="flow-item" role="tab" id="flow-tab-focus" aria-controls="flow-focus" aria-selected="true" tabindex="0">
               <span class="ti" set:html={svg("eye")} />
-              <span class="flow-copy"><span class="flow-title">Focus and typewriter modes</span><span class="flow-desc">Fade everything but the paragraph you're writing, and keep your line in the middle of the screen.</span></span>
+              <span class="flow-progress" aria-hidden="true"><span></span></span><span class="flow-copy"><span class="flow-title">Focus and typewriter modes</span><span class="flow-desc">Fade everything but the paragraph you're writing, and keep your line in the middle of the screen.</span></span>
             </button>
             <button type="button" class="flow-item" role="tab" id="flow-tab-palette" aria-controls="flow-palette" aria-selected="false" tabindex="-1">
               <span class="ti" set:html={svg("command")} />
-              <span class="flow-copy"><span class="flow-title">One shortcut for everything</span><span class="flow-desc">Press ⌘K to run any command, switch theme, or jump to a file or heading.</span></span>
+              <span class="flow-progress" aria-hidden="true"><span></span></span><span class="flow-copy"><span class="flow-title">One shortcut for everything</span><span class="flow-desc">Press ⌘K to run any command, switch theme, or jump to a file or heading.</span></span>
             </button>
             <button type="button" class="flow-item" role="tab" id="flow-tab-outline" aria-controls="flow-outline" aria-selected="false" tabindex="-1">
               <span class="ti" set:html={svg("tree")} />
-              <span class="flow-copy"><span class="flow-title">Outline, files and search</span><span class="flow-desc">Jump between headings in long documents, browse your folder, and search all of it.</span></span>
+              <span class="flow-progress" aria-hidden="true"><span></span></span><span class="flow-copy"><span class="flow-title">Outline, files and search</span><span class="flow-desc">Jump between headings in long documents, browse your folder, and search all of it.</span></span>
             </button>
             <button type="button" class="flow-item" role="tab" id="flow-tab-themes" aria-controls="themes" aria-selected="false" tabindex="-1">
               <span class="ti" set:html={svg("layers")} />
-              <span class="flow-copy"><span class="flow-title">Make it yours</span><span class="flow-desc">Thirteen light and dark themes, or your own, and any font on your computer.</span></span>
+              <span class="flow-progress" aria-hidden="true"><span></span></span><span class="flow-copy"><span class="flow-title">Make it yours</span><span class="flow-desc">Thirteen light and dark themes, or your own, and any font on your computer.</span></span>
             </button>
           </div>
 
@@ -358,64 +401,107 @@ const faqLd = {
             <li><Fragment set:html={svg("hdd")} />Plain .md files you own</li>
           </ul>
         </div>
-            <div class="dl-picker" id="dl-picker" role="tablist" aria-label="Choose your operating system">
-              <span class="dl-thumb" id="dl-thumb" aria-hidden="true"></span>
-              <button type="button" class="dl-os" data-os="linux" data-label="Linux" data-file={BUILDS.linux.file} data-size={BUILDS.linux.size} data-href={`${DL}/${BUILDS.linux.file}`} role="tab" aria-selected="false">
-                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8.996 4.497c.104-.076.1-.168.186-.158s.022.102-.098.207c-.12.104-.308.243-.46.323-.291.152-.631.336-.993.336s-.647-.167-.853-.33c-.102-.082-.186-.162-.248-.221-.11-.086-.096-.207-.052-.204.075.01.087.109.134.153.064.06.144.137.241.214.195.154.454.304.778.304s.702-.19.932-.32c.13-.073.297-.204.433-.304M7.34 3.781c.055-.02.123-.031.174-.003.011.006.024.021.02.034-.012.038-.074.032-.11.05-.032.017-.057.052-.093.054-.034 0-.086-.012-.09-.046-.007-.044.058-.072.1-.089m.581-.003c.05-.028.119-.018.173.003.041.017.106.045.1.09-.004.033-.057.046-.09.045-.036-.002-.062-.037-.093-.053-.036-.019-.098-.013-.11-.051-.004-.013.008-.028.02-.034"></path><path fill-rule="evenodd" d="M8.446.019c2.521.003 2.38 2.66 2.364 4.093-.01.939.509 1.574 1.04 2.244.474.56 1.095 1.38 1.45 2.32.29.765.402 1.613.115 2.465a.8.8 0 0 1 .254.152l.001.002c.207.175.271.447.329.698.058.252.112.488.224.615.344.382.494.667.48.922-.015.254-.203.43-.435.57-.465.28-1.164.491-1.586 1.002-.443.527-.99.83-1.505.871a1.25 1.25 0 0 1-1.256-.716v-.001a1 1 0 0 1-.078-.21c-.67.038-1.252-.165-1.718-.128-.687.038-1.116.204-1.506.206-.151.331-.445.547-.808.63-.5.114-1.126 0-1.743-.324-.577-.306-1.31-.278-1.85-.39-.27-.057-.51-.157-.626-.384-.116-.226-.095-.538.07-.988.051-.16.012-.398-.026-.648a2.5 2.5 0 0 1-.037-.369c0-.133.022-.265.087-.386v-.002c.14-.266.368-.377.577-.451s.397-.125.53-.258c.143-.15.27-.374.443-.56q.036-.037.073-.07c-.081-.538.007-1.105.192-1.662.393-1.18 1.223-2.314 1.811-3.014.502-.713.65-1.287.701-2.016.042-.997-.705-3.974 2.112-4.2q.168-.015.321-.013m2.596 10.866-.03.016c-.223.121-.348.337-.427.656-.08.32-.107.733-.13 1.206v.001c-.023.37-.192.824-.31 1.267s-.176.862-.036 1.128v.002c.226.452.608.636 1.051.601s.947-.304 1.36-.795c.474-.576 1.218-.796 1.638-1.05.21-.126.324-.242.333-.4.009-.157-.097-.403-.425-.767-.17-.192-.217-.462-.274-.71-.056-.247-.122-.468-.26-.585l-.001-.001c-.18-.157-.356-.17-.565-.164q-.069.001-.14.005c-.239.275-.805.612-1.197.508-.359-.09-.562-.508-.587-.918m-7.204.03H3.83c-.189.002-.314.09-.44.225-.149.158-.276.382-.445.56v.002h-.002c-.183.184-.414.239-.61.31-.195.069-.353.143-.46.35v.002c-.085.155-.066.378-.029.624.038.245.096.507.018.746v.002l-.001.002c-.157.427-.155.678-.082.822.074.143.235.22.48.272.493.103 1.26.069 1.906.41.583.305 1.168.404 1.598.305.431-.098.712-.369.75-.867v-.002c.029-.292-.195-.673-.485-1.052-.29-.38-.633-.752-.795-1.09v-.002l-.61-1.11c-.21-.286-.43-.462-.68-.5a1 1 0 0 0-.106-.008M9.584 4.85c-.14.2-.386.37-.695.467-.147.048-.302.17-.495.28a1.3 1.3 0 0 1-.74.19.97.97 0 0 1-.582-.227c-.14-.113-.25-.237-.394-.322a3 3 0 0 1-.192-.126c-.063 1.179-.85 2.658-1.226 3.511a5.4 5.4 0 0 0-.43 1.917c-.68-.906-.184-2.066.081-2.568.297-.55.343-.701.27-.649-.266.436-.685 1.13-.848 1.844-.085.372-.1.749.01 1.097.11.349.345.67.766.931.573.351.963.703 1.193 1.015s.302.584.23.777a.4.4 0 0 1-.212.22.7.7 0 0 1-.307.056l.184.235c.094.124.186.249.266.375 1.179.805 2.567.496 3.568-.218.1-.342.197-.664.212-.903.024-.474.05-.896.136-1.245s.244-.634.53-.791a1 1 0 0 1 .138-.061q.005-.045.013-.087c.082-.546.569-.572 1.18-.303.588.266.81.499.71.814h.13c.122-.398-.133-.69-.822-1.025l-.137-.06a2.35 2.35 0 0 0-.012-1.113c-.188-.79-.704-1.49-1.098-1.838-.072-.003-.065.06.081.203.363.333 1.156 1.532.727 2.644a1.2 1.2 0 0 0-.342-.043c-.164-.907-.543-1.66-.735-2.014-.359-.668-.918-2.036-1.158-2.983M7.72 3.503a1 1 0 0 0-.312.053c-.268.093-.447.286-.559.391-.022.021-.05.04-.119.091s-.172.126-.321.238q-.198.151-.13.38c.046.15.192.325.459.476.166.098.28.23.41.334a1 1 0 0 0 .215.133.9.9 0 0 0 .298.066c.282.017.49-.068.673-.173s.34-.233.518-.29c.365-.115.627-.345.709-.564a.37.37 0 0 0-.01-.309c-.048-.096-.148-.187-.318-.257h-.001c-.354-.151-.507-.162-.705-.29-.321-.207-.587-.28-.807-.279m-.89-1.122h-.025a.4.4 0 0 0-.278.135.76.76 0 0 0-.191.334 1.2 1.2 0 0 0-.051.445v.001c.01.162.041.299.102.436.05.116.109.204.183.274l.089-.065.117-.09-.023-.018a.4.4 0 0 1-.11-.161.7.7 0 0 1-.054-.22v-.01a.7.7 0 0 1 .014-.234.4.4 0 0 1 .08-.179q.056-.069.126-.073h.013a.18.18 0 0 1 .123.05c.045.04.08.09.11.162a.7.7 0 0 1 .054.22v.01a.7.7 0 0 1-.002.17 1.1 1.1 0 0 1 .317-.143 1.3 1.3 0 0 0 .002-.194V3.23a1.2 1.2 0 0 0-.102-.437.8.8 0 0 0-.227-.31.4.4 0 0 0-.268-.102m1.95-.155a.63.63 0 0 0-.394.14.9.9 0 0 0-.287.376 1.2 1.2 0 0 0-.1.51v.015q0 .079.01.152c.114.027.278.074.406.138a1 1 0 0 1-.011-.172.8.8 0 0 1 .058-.278.5.5 0 0 1 .139-.2.26.26 0 0 1 .182-.069.26.26 0 0 1 .178.081c.055.054.094.12.124.21.029.086.042.17.04.27l-.002.012a.8.8 0 0 1-.057.277c-.024.059-.089.106-.122.145.046.016.09.03.146.052a5 5 0 0 1 .248.102 1.2 1.2 0 0 0 .244-.763 1.2 1.2 0 0 0-.11-.495.9.9 0 0 0-.294-.37.64.64 0 0 0-.39-.133z"></path></svg>
-                Linux
-              </button>
-              <button type="button" class="dl-os" data-os="mac" data-label="macOS" data-file={BUILDS.mac.file} data-size={BUILDS.mac.size} data-href={`${DL}/${BUILDS.mac.file}`} role="tab" aria-selected="false">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.7 2.8c.1 1-.3 2-1 2.8-.7.8-1.7 1.4-2.7 1.3-.1-1 .4-2 1-2.7.7-.8 1.8-1.3 2.7-1.4ZM19 17c-.5 1.2-.8 1.7-1.5 2.7-1 1.4-2.4 3.1-4.1 3.1-1.5 0-1.9-1-3.9-1-2 0-2.5 1-4 1-1.7 0-3-1.6-4-3C-.3 16.6-.6 11 1.7 8.3c1-1.3 2.6-2.1 4.1-2.1 1.6 0 2.6 1 3.9 1 1.3 0 2-1 3.9-1 1.4 0 2.9.8 3.9 2.1-3.4 1.9-2.9 6.8 1.6 8.7Z"></path></svg>
-                macOS
-              </button>
-              <button type="button" class="dl-os" data-os="win" data-label="Windows" data-file={BUILDS.win.file} data-size={BUILDS.win.size} data-href={`${DL}/${BUILDS.win.file}`} role="tab" aria-selected="false">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3.9 10.5 2.9v8.1H3V3.9ZM11.5 2.8 21 1.5V11H11.5V2.8ZM3 12.9h7.5V21L3 20V12.9ZM11.5 13H21v9.5L11.5 21.2V13Z"></path></svg>
-                Windows
-              </button>
-            </div>
-
-            <div>
-              <a class="btn btn-primary dl-cta" id="dl-cta" href={`${DL}/${BUILDS.mac.file}`} download>
-                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg>
-                <span id="dl-cta-label">Download for macOS</span>
+        <div class="pgrid reveal">
+          {PLATFORMS.map((p) => (
+            <article class="pcard" data-os={p.key} aria-labelledby={`pc-${p.key}`}>
+              <span class="you-badge">Your system</span>
+              <span class="picon" set:html={osSvg(p.key)} />
+              <h3 id={`pc-${p.key}`}>{p.label}</h3>
+              <p class="preq">{p.req}</p>
+              <a class="btn btn-primary pdl" href={`${DL}/${p.build.file}`} download>
+                <Fragment set:html={svg("download", "ico")} />{p.cta}
               </a>
-              <p class="dl-meta"><span id="dl-file">{BUILDS.mac.file}</span> · <span id="dl-size">{BUILDS.mac.size}</span> · <b>v{VERSION}</b></p>
+              <p class="pmeta">{p.build.size} · version {VERSION}</p>
+              <p class="palt">
+                {p.alts.map((alt, i) => (
+                  <Fragment>{i > 0 && <span aria-hidden="true"> · </span>}<a href={alt.href} {...(alt.href.startsWith("http") && !alt.href.includes("/download/") ? { target: "_blank", rel: "noopener" } : {})}>{alt.label}</a>{alt.note && <span class="pnote"> {alt.note}</span>}</Fragment>
+                ))}
+              </p>
+            </article>
+          ))}
+        </div>
 
-              <div class="dl-alt dl-distros" data-os="linux">
-                <a class="dl-distro" href={`${DL}/${ALT.deb}`} download>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.3" fill="none" stroke="#E95420" stroke-width="1.8"></circle><circle cx="12" cy="3.6" r="2.1" fill="#E95420"></circle><circle cx="4.6" cy="16.2" r="2.1" fill="#E95420"></circle><circle cx="19.4" cy="16.2" r="2.1" fill="#E95420"></circle><circle cx="12" cy="12" r="2" fill="#E95420"></circle></svg>
-                  <span>Ubuntu <em>.deb</em></span>
-                </a>
-                <a class="dl-distro" href={`${DL}/${ALT.deb}`} download>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#D70A53" stroke-width="1.8" stroke-linecap="round" d="M14.6 5.1A8 8 0 1 0 19 13.6 5.6 5.6 0 1 1 12.9 7.7 3.2 3.2 0 1 0 11 13.1"></path></svg>
-                  <span>Debian <em>.deb</em></span>
-                </a>
-                <a class="dl-distro" href={`${DL}/${ALT.rpm}`} download>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#3C6EB4"></circle><path fill="#fff" d="M14 6.4c-1.9 0-3.3 1.2-3.3 3.2v1.2H9v2.2h1.7V18H13v-5h2v-2.2h-2V9.7c0-.7.4-1.1 1.1-1.1h1V6.5c-.4-.1-.8-.1-1.1-.1Z"></path></svg>
-                  <span>Fedora <em>.rpm</em></span>
-                </a>
-                <a class="dl-distro" href={SNAP} target="_blank" rel="noopener">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#4A9E8F" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5V8Z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>
-                  <span>Snap <em>store</em></span>
-                </a>
-              </div>
-              <div class="dl-alt" data-os="mac">One app for Apple&nbsp;Silicon and Intel Macs, macOS 10.15 or later</div>
-              <div class="dl-alt" data-os="win">Prefer an MSI? <a href={`${DL}/${ALT.msi}`}>Download the .msi installer</a></div>
+        <div class="help reveal" id="install-help">
+          <div class="help-head">
+            <h3>Installing</h3>
+            <div class="tabs help-tabs" role="tablist" aria-label="Install help by platform">
+              {PLATFORMS.map((p, i) => (
+                <button type="button" class="tab" role="tab" id={`help-tab-${p.key}`} aria-controls={`help-${p.key}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+                  <Fragment set:html={osSvg(p.key)} />{p.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-              <!-- macOS: two ways to install, side by side. Homebrew first, since it
-                   avoids the first-launch prompt; the .dmg card explains that prompt. -->
-              <div class="dl-alt mac-ways" data-os="mac">
-                <section class="way" id="macos-homebrew" aria-labelledby="brew-title">
-                  <div class="way-head">
-                    <h3 id="brew-title">Install with Homebrew</h3>
-                    <span class="way-tag">Recommended</span>
-                  </div>
-                  <p>No security prompt, and <code>brew upgrade</code> keeps Sarala up to date.</p>
+          <div class="help-panel" role="tabpanel" id="help-mac" aria-labelledby="help-tab-mac">
+            <div class="help-cols">
+              <section aria-labelledby="brew-title" id="macos-homebrew">
+                <h4 id="brew-title">With Homebrew <span class="way-tag">Recommended</span></h4>
+                <p>No security prompt, and <code>brew upgrade</code> keeps Sarala up to date.</p>
+                <div class="cmd">
+                  <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
+                  <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>
+                </div>
+              </section>
+              <section aria-labelledby="gk-title" id="macos-first-launch">
+                <h4 id="gk-title">With the .dmg</h4>
+                <p>Sarala isn't notarized by Apple, so macOS blocks the first launch. One command clears it.</p>
+                <ol class="way-steps">
+                  <li><span>Drag <b>Sarala</b> into <b>Applications</b>.</span></li>
+                  <li><span>Run this once in <b>Terminal</b>, then open Sarala.</span></li>
+                </ol>
+                <div class="cmd">
+                  <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#gk-cmd"><span class="gk-copy-label">Copy</span></button></div>
+                  <pre id="gk-cmd"><code>{QUARANTINE_CMD}</code></pre>
+                </div>
+                <details class="way-more">
+                  <summary>No Terminal? Use System Settings instead</summary>
+                  <ol class="way-steps">
+                    <li><span>Open Sarala. When macOS blocks it, click <b>Done</b>.</span></li>
+                    <li><span>In <b>System Settings › Privacy &amp; Security</b>, click <b>Open Anyway</b>.</span></li>
+                  </ol>
+                  <p class="fine">On macOS 14 or older, right-click Sarala and choose <b>Open</b>. A "Sarala is damaged" message is the same warning, and either route clears it.</p>
+                </details>
+              </section>
+            </div>
+          </div>
+
+          <div class="help-panel" role="tabpanel" id="help-win" aria-labelledby="help-tab-win" hidden>
+            <div class="help-cols">
+              <section>
+                <h4>Running the installer</h4>
+                <ol class="way-steps">
+                  <li><span>Open <b>{BUILDS.win.file}</b> and follow the prompts. No administrator rights needed.</span></li>
+                  <li><span>If Windows shows <b>"Windows protected your PC"</b>, click <b>More info</b>, then <b>Run anyway</b>.</span></li>
+                </ol>
+                <p class="fine">The installer isn't code-signed yet, so SmartScreen asks once. You can <a href={RELEASES} target="_blank" rel="noopener">verify the checksums</a> first.</p>
+              </section>
+              <section>
+                <h4>For IT and managed devices</h4>
+                <p>Use the <a href={`${DL}/${ALT.msi}`}>.msi package</a> ({ALT_SIZE.msi}) with your deployment tool. Updates install from inside the app either way.</p>
+              </section>
+            </div>
+          </div>
+
+          <div class="help-panel" role="tabpanel" id="help-linux" aria-labelledby="help-tab-linux" hidden>
+            <div class="help-cols">
+              {LINUX_CMDS.map((c) => (
+                <section>
+                  <h4>{c.label}</h4>
                   <div class="cmd">
-                    <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
-                    <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>
+                    <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy={`#${c.id}`}><span class="gk-copy-label">Copy</span></button></div>
+                    <pre id={c.id}><code>{c.cmd}</code></pre>
                   </div>
                 </section>
+              ))}
+            </div>
+          </div>
+          <p class="gk-copy-status visually-hidden" id="gk-copy-status" role="status" aria-live="polite"></p>
+        </div>
+
+        <p class="dl-foot"><a href={RELEASES} target="_blank" rel="noopener">All releases, release notes and checksums</a></p>
+      </div>
+    </section>
 
                 <section class="way" id="macos-first-launch" aria-labelledby="gk-title">
                   <div class="way-head">

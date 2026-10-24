@@ -56,6 +56,48 @@
     }
   }
 
+  /* ---------- FEATURE TOUR: advance on its own until the visitor takes over ----------
+     WCAG 2.2.2: pauses on hover, focus, when off-screen or in a hidden tab,
+     stops for good once a feature is picked, and never runs with reduced motion. */
+  var flow = document.querySelector(".flow");
+  if (flow && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var flowTabs = Array.prototype.slice.call(flow.querySelectorAll('[role="tab"]'));
+    var DUR = 6000, timer = 0, startedAt = 0, left = DUR, stopped = false, visible = false, hovering = false, focused = false;
+    flow.style.setProperty("--flow-dur", DUR / 1000 + "s");
+    function current() { return flowTabs.findIndex(function (t) { return t.getAttribute("aria-selected") === "true"; }); }
+    function restartBar() {
+      var bar = flowTabs[current()].querySelector(".flow-progress span");
+      if (!bar) return;
+      bar.style.animation = "none"; void bar.offsetWidth; bar.style.animation = "";
+    }
+    function advance() {
+      var next = flowTabs[(current() + 1) % flowTabs.length];
+      next.dataset.auto = "1"; next.click(); delete next.dataset.auto;
+      left = DUR; restartBar(); schedule();
+    }
+    function schedule() {
+      clearTimeout(timer);
+      var run = !stopped && visible && !hovering && !focused && !document.hidden;
+      flow.classList.toggle("playing", !stopped);
+      flow.classList.toggle("paused", !run);
+      if (!run) return;
+      startedAt = Date.now();
+      timer = setTimeout(advance, left);
+    }
+    function pause() { if (startedAt && !flow.classList.contains("paused")) left = Math.max(0, left - (Date.now() - startedAt)); schedule(); }
+    flowTabs.forEach(function (t) {
+      t.addEventListener("click", function () { if (!t.dataset.auto) { stopped = true; clearTimeout(timer); flow.classList.remove("playing"); } });
+    });
+    flow.addEventListener("pointerenter", function () { hovering = true; pause(); });
+    flow.addEventListener("pointerleave", function () { hovering = false; schedule(); });
+    flow.addEventListener("focusin", function () { focused = true; pause(); });
+    flow.addEventListener("focusout", function () { focused = false; schedule(); });
+    document.addEventListener("visibilitychange", function () { document.hidden ? pause() : schedule(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; visible ? schedule() : pause(); }, { threshold: 0.4 }).observe(flow);
+    } else { visible = true; schedule(); }
+  }
+
   /* ---------- #themes lives in a tab panel: open it when linked to ---------- */
   function openThemes() {
     if (location.hash !== "#themes") return;
@@ -116,91 +158,29 @@
     });
   });
 
-  /* ---------- DOWNLOAD OS PICKER ---------- */
-  var dlPicker = document.getElementById("dl-picker");
-  if (dlPicker) {
-    var dlCta = document.getElementById("dl-cta");
-    var dlLabel = document.getElementById("dl-cta-label");
-    var dlFile = document.getElementById("dl-file");
-    var dlSize = document.getElementById("dl-size");
-    var osBtns = Array.prototype.slice.call(dlPicker.querySelectorAll(".dl-os"));
-    var altBlocks = Array.prototype.slice.call(document.querySelectorAll(".dl-alt"));
-
-    function selectOS(os) {
-      var matched = false;
-      osBtns.forEach(function (b) {
-        var on = b.getAttribute("data-os") === os;
-        b.classList.toggle("active", on);
-        b.setAttribute("aria-selected", on ? "true" : "false");
-        b.tabIndex = on ? 0 : -1;
-        if (on) {
-          matched = true;
-          dlCta.href = b.getAttribute("data-href");
-          dlLabel.textContent = "Download for " + b.getAttribute("data-label");
-          dlFile.textContent = b.getAttribute("data-file");
-          dlSize.textContent = b.getAttribute("data-size");
-        }
-      });
-      if (!matched) return;
-      altBlocks.forEach(function (a) {
-        a.classList.toggle("on", a.getAttribute("data-os") === os);
-      });
-      document.dispatchEvent(new CustomEvent("sarala:os", { detail: { os: os } }));
-    }
-
-    osBtns.forEach(function (b, i) {
-      b.addEventListener("click", function () { selectOS(b.getAttribute("data-os")); });
-      // Roving-tabindex arrow keys, as a tablist is expected to behave.
-      b.addEventListener("keydown", function (e) {
-        var next = null;
-        if (e.key === "ArrowRight" || e.key === "ArrowDown") next = osBtns[(i + 1) % osBtns.length];
-        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = osBtns[(i - 1 + osBtns.length) % osBtns.length];
-        else if (e.key === "Home") next = osBtns[0];
-        else if (e.key === "End") next = osBtns[osBtns.length - 1];
-        if (!next) return;
-        e.preventDefault();
-        selectOS(next.getAttribute("data-os"));
-        next.focus();
-      });
-    });
-
-    // Preselect the visitor's OS (macOS when it can't be told, e.g. on a phone).
-    var os = detectedOS || "mac";
-    selectOS(os);
-
-    // Deep link: /#macos-first-launch opens the Gatekeeper panel on any platform,
-    // so release notes and support replies can point straight at it. The panel
-    // starts hidden, so the browser's own hash jump never finds it.
-    var docEl = document.documentElement;
-
-    function aimAtNote(note, smooth) {
-      // The page uses `scroll-behavior: smooth`, and everything above the panel
-      // (lazy screenshots, reveal transforms) keeps resizing while a long
-      // animated scroll is in flight, which lands us past the target. Jump
-      // instantly instead, and re-aim as the layout settles.
-      var prev = docEl.style.scrollBehavior;
-      if (!smooth) docEl.style.scrollBehavior = "auto";
-      // block:"start" + scroll-margin-top lands on the heading, clearing the
-      // sticky nav; the panel is taller than a phone viewport.
-      note.scrollIntoView({ block: "start" });
-      if (!smooth) docEl.style.scrollBehavior = prev;
-    }
-
-    function openMacNote(smooth) {
-      if (location.hash !== "#macos-first-launch") return;
-      selectOS("mac");
-      var note = document.getElementById("macos-first-launch");
-      if (!note) return;
-      requestAnimationFrame(function () { aimAtNote(note, smooth); });
-      if (smooth) return;
-      window.addEventListener("load", function () {
-        aimAtNote(note, false);
-        setTimeout(function () { aimAtNote(note, false); }, 400);
-      });
-    }
-    window.addEventListener("hashchange", function () { openMacNote(true); });
-    openMacNote(false);
+  /* ---------- DOWNLOAD: highlight the visitor's platform, open its install help ---------- */
+  var helpOS = detectedOS || "mac";
+  if (detectedOS) {
+    var mine = document.querySelector('.pcard[data-os="' + detectedOS + '"]');
+    if (mine) mine.classList.add("is-you");
   }
+  function openHelp(os) {
+    var tab = document.getElementById("help-tab-" + os);
+    if (tab && tab.getAttribute("aria-selected") !== "true") tab.click();
+  }
+  openHelp(helpOS);
+  // In-page links into a help panel (#help-mac from the Homebrew link, or the
+  // long-standing /#macos-first-launch deep link) open the right tab first.
+  function followHelpHash() {
+    var h = location.hash.slice(1);
+    var os = /^(help-mac|macos-first-launch|macos-homebrew)$/.test(h) ? "mac" : h === "help-win" ? "win" : h === "help-linux" ? "linux" : null;
+    if (!os) return;
+    openHelp(os);
+    var target = document.getElementById(h);
+    if (target) requestAnimationFrame(function () { target.scrollIntoView({ block: "start" }); });
+  }
+  window.addEventListener("hashchange", followHelpHash);
+  followHelpHash();
 
   /* ---------- LIGHTBOX for every [data-zoom] screenshot ---------- */
   var lb = document.getElementById("lightbox");

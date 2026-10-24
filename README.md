@@ -17,7 +17,7 @@ Live at **[sarala.solancer.com](https://sarala.solancer.com)**.
 ## SEO
 
 - Per-page `<title>`, meta description, and canonical URL.
-- Open Graph + Twitter Card tags (`og:image` uses `public/screenshots/hero-final.png`).
+- Open Graph + Twitter Card tags (`og:image` uses `public/screenshots/og.png`, 1200×630).
 - `SoftwareApplication` JSON-LD structured data.
 - `robots.txt` and an auto-generated sitemap.
 - Theme palette is restored before first paint to avoid a flash of the default colors.

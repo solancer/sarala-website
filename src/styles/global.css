@@ -435,6 +435,9 @@ h1.hero-title {
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 5vw, 72px); align-items: center; }
 @media (max-width: 860px){ .split { grid-template-columns: 1fr; } }
 .split.rev .split-text { order: 2; }
+/* Stacked on small screens, text comes first in every split. */
+@media (max-width: 860px){ .split.rev .split-text { order: 0; } }
+a.eyebrow { text-decoration: none; color: inherit; }
 .feat-list { margin-top: 28px; display: flex; flex-direction: column; gap: 20px; }
 .feat-item { display: flex; gap: 16px; }
 .feat-item .fnum { font-family: "JetBrains Mono", monospace; color: var(--blue); font-size: 14px; padding-top: 2px; min-width: 24px; }
@@ -1150,6 +1153,21 @@ h1.hero-title {
   scrollbar-width: none;
 }
 .shots-track::-webkit-scrollbar { display: none; }
+/* A screenshot beside text (AI and voice sections): the same frame as the
+   carousel shots, and it opens full-size in the same lightbox. */
+.spot-shot { margin: 0; cursor: zoom-in; min-width: 0; }
+.spot-shot img {
+  width: 100%; height: auto; display: block; border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 70px -42px rgba(0,0,0,.55);
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+}
+.spot-shot:hover img { transform: translateY(-4px); box-shadow: 0 44px 84px -38px rgba(0,0,0,.6); }
+.spot-shot figcaption {
+  text-align: center; margin-top: 14px;
+  font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--muted); letter-spacing: .01em;
+}
+@media (prefers-reduced-motion: reduce){ .spot-shot img { transition: none; } .spot-shot:hover img { transform: none; } }
 .shot {
   flex: 0 0 auto; width: min(880px, 84vw); scroll-snap-align: center;
   margin: 0; position: relative; cursor: zoom-in;

@@ -8,6 +8,25 @@ const CONTRIBUTING = `${GITHUB}/blob/main/CONTRIBUTING.md`;
 
 const QUARANTINE_CMD = `xattr -dr com.apple.quarantine ${MAC_APP_PATH}`;
 
+/**
+ * The screenshot carousel, in order. Real captures from the app (the
+ * `showcase/` folder in this repo is the workspace they were taken in), framed
+ * at 1680×1125. Add a shot by adding a line.
+ */
+const SHOTS = [
+  { file: "live-editor", alt: "Sarala's live editor with a folder open: tables, callouts, highlights and task lists rendered as you type", cap: "Live editor · your folder, rendered as you type" },
+  { file: "ai-assistant", alt: "The AI assistant proposing two edits to a Kubernetes runbook, shown as diffs with Accept and Reject", cap: "AI assistant · every edit is a diff you approve" },
+  { file: "voice-typing", alt: "Voice typing in Sarala: a recording pill with a live waveform while words stream into the document", cap: "Voice typing · offline, on your machine" },
+  { file: "diagrams", alt: "A Mermaid flowchart of a Kubernetes request path rendered inline in Sarala", cap: "Diagrams · Mermaid and D2, rendered inline" },
+  { file: "runbook", alt: "A Mermaid sequence diagram of a rolling update in a Kubernetes runbook", cap: "Runbooks · sequence diagrams, callouts and code" },
+  { file: "math", alt: "Queueing-theory equations rendered with KaTeX in Sarala", cap: "Math · LaTeX rendered live with KaTeX" },
+  { file: "code", alt: "A syntax-highlighted Java Kafka producer in Sarala's Night theme, with the outline beside it", cap: "Code · syntax highlighting in 100+ languages" },
+  { file: "dark-mode", alt: "A long Kafka guide in Sarala's Night theme with the document outline", cap: "Dark mode · Night theme with live outline" },
+  { file: "tables", alt: "A settings table, rollout checklist and warning callout in the GitHub theme", cap: "Tables, tasks & callouts · GitHub theme" },
+  { file: "command-palette", alt: "The command palette listing themes with colour swatches", cap: "Command palette · every action, one keystroke away" },
+  { file: "themes", alt: "Sarala's theme gallery with thirteen light and dark themes", cap: "Themes · thirteen built in, or build your own" },
+];
+
 /** The Homebrew route: tap the repo, trust the cask once, install. */
 const BREW_CMDS = [
   `brew tap solancer/sarala ${GITHUB}`,
@@ -26,6 +45,7 @@ const BREW_CMDS = [
       </a>
       <nav class="nav-links">
         <a href="#screenshots">Screenshots</a>
+        <a href="#ai">AI &amp; voice</a>
         <a href="#preview">Live preview</a>
         <a href="#features">Features</a>
         <a href="#themes">Themes</a>
@@ -56,7 +76,7 @@ const BREW_CMDS = [
         <div class="hero-mark reveal">
           <img src="/assets/sarala-icon.png" alt="Sarala app icon" width="128" height="128" />
         </div>
-        <span class="eyebrow reveal"><span class="pip"></span> <span class="eb-lead">free &amp; open source · GPL-3.0 · </span><b>now on the Snap Store</b></span>
+        <a class="eyebrow reveal" href="#ai"><span class="pip"></span> <span class="eb-lead">free &amp; open source · v{VERSION} · </span><b>new: AI assistant &amp; voice typing</b></a>
         <h1 class="hero-title reveal">Markdown that reads like a <span class="grad">finished&nbsp;document.</span></h1>
         <p class="hero-sub reveal">
           Sarala is a minimal writing app that renders Markdown the moment you type it — no split panes, no preview
@@ -180,7 +200,7 @@ const BREW_CMDS = [
         <div class="sec-head center reveal">
           <span class="kicker" style="justify-content:center">Screenshots</span>
           <h2>See Sarala in action.</h2>
-          <p>Real captures from the app — the live editor, syntax highlighting, math, diagrams and more. Click any shot to open it full-size.</p>
+          <p>Real captures from Sarala 1.3: the live editor, the AI assistant, voice typing, diagrams, math and more. Click any shot to open it full-size.</p>
         </div>
 
         <div class="shots-carousel reveal">
@@ -188,52 +208,75 @@ const BREW_CMDS = [
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
           </button>
           <div class="shots-track" id="shots-track">
-            <figure class="shot">
-              <img src="/screenshots/shots/live-editor.webp" alt="Sarala live editor rendering Markdown in the warm Sarala theme" loading="lazy" width="1680" height="1173" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Live editor · Sarala theme</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/dark-mode.webp" alt="Sarala in a warm dark palette" loading="lazy" width="1680" height="1157" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Dark mode · Ristretto palette</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/code.webp" alt="Syntax-highlighted code blocks in Sarala" loading="lazy" width="1680" height="1027" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Syntax highlighting · 100+ languages</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/math.webp" alt="LaTeX math rendered with KaTeX in Sarala" loading="lazy" width="1680" height="1002" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Math · rendered live with KaTeX</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/diagrams.webp" alt="Animated D2 diagrams in Sarala" loading="lazy" width="1680" height="1049" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Diagrams · Mermaid &amp; animated D2</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/tables.webp" alt="Markdown tables and task lists in Sarala" loading="lazy" width="1680" height="1141" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Tables &amp; task lists · rendered as you type</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/fonts.webp" alt="Font picker in Sarala for editor and code fonts" loading="lazy" width="1680" height="1153" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Fonts · bring your own editor &amp; code fonts</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/shots/update.webp" alt="Built-in auto-updater dialog in Sarala" loading="lazy" width="1680" height="1145" />
-              <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-              <figcaption>Auto-update · always on the latest build</figcaption>
-            </figure>
+            {SHOTS.map((shot) => (
+              <figure class="shot">
+                <img src={`/screenshots/shots/${shot.file}.webp`} alt={shot.alt} loading="lazy" width="1680" height="1125" />
+                <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
+                <figcaption>{shot.cap}</figcaption>
+              </figure>
+            ))}
           </div>
           <button class="shots-nav next" aria-label="Next screenshot">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
           </button>
         </div>
         <div class="shots-dots" id="shots-dots"></div>
+      </div>
+    </section>
+
+    <!-- ============ AI ASSISTANT ============ -->
+    <section class="section" id="ai">
+      <div class="wrap">
+        <div class="split">
+          <div class="split-text">
+            <div class="sec-head reveal">
+              <span class="kicker">New in 1.3 · AI assistant</span>
+              <h2>AI that edits with your permission.</h2>
+              <p>
+                Ask Claude Code, OpenAI Codex or GitHub Copilot to review, summarise or rewrite your document. Their
+                changes arrive as diffs, block by block. Nothing touches your file until you accept it, and undo works
+                as usual.
+              </p>
+            </div>
+            <div class="feat-list">
+              <div class="feat-item reveal"><span class="fnum">01</span><div><h4>Every edit is a proposal</h4><p>Word-level diffs with Accept and Reject on each change, or accept them all at once.</p></div></div>
+              <div class="feat-item reveal"><span class="fnum">02</span><div><h4>No keys, no account</h4><p>Sarala runs the agent already installed on your computer, with its own sign-in. It stores no API keys.</p></div></div>
+              <div class="feat-item reveal"><span class="fnum">03</span><div><h4>Works on a private copy</h4><p>The agent edits a scratch copy of the document with file tools only, never your real file.</p></div></div>
+            </div>
+          </div>
+          <figure class="spot-shot reveal" data-zoom>
+            <img src="/screenshots/shots/ai-assistant.webp" alt="Claude Code proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject" loading="lazy" width="1680" height="1125" />
+            <figcaption>Claude Code proposes; you accept or reject each change.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VOICE TYPING ============ -->
+    <section class="section" id="voice" style="background:var(--bg-deep)">
+      <div class="wrap">
+        <div class="split rev">
+          <div class="split-text">
+            <div class="sec-head reveal">
+              <span class="kicker">New in 1.3 · Voice typing</span>
+              <h2>Speak, and Sarala types. Fully offline.</h2>
+              <p>
+                Hold a shortcut and talk. Speech is turned into text on your computer by an open model you download
+                once: nothing is uploaded, and there is no account or key. Built with people who can't easily type in
+                mind.
+              </p>
+            </div>
+            <div class="feat-list">
+              <div class="feat-item reveal"><span class="fnum">01</span><div><h4>Push to talk, or tap to toggle</h4><p>Hold the shortcut while you speak, tap to start and stop, or both. A small pill shows the level and timer.</p></div></div>
+              <div class="feat-item reveal"><span class="fnum">02</span><div><h4>Commands, hands-free</h4><p>Say “new paragraph”, “scratch that” or “bold that”. Pause to type as you go, without touching the keyboard.</p></div></div>
+              <div class="feat-item reveal"><span class="fnum">03</span><div><h4>Set up in a minute</h4><p>Pick your language, check your microphone with a live level meter, choose a shortcut, try it.</p></div></div>
+            </div>
+          </div>
+          <figure class="spot-shot reveal" data-zoom>
+            <img src="/screenshots/shots/voice-setup.webp" alt="Sarala's voice typing set-up: language, microphone check with a live level meter, shortcut, try it" loading="lazy" width="1680" height="1125" />
+            <figcaption>The four-step set-up, with a live microphone check.</figcaption>
+          </figure>
+        </div>
       </div>
     </section>
 
@@ -451,9 +494,9 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
     <section class="section" id="themes">
       <div class="wrap">
         <div class="sec-head reveal">
-          <span class="kicker">Seven built-in palettes</span>
+          <span class="kicker">Thirteen built-in themes</span>
           <h2>Pick a palette. The whole app follows.</h2>
-          <p>Every Sarala palette is a complete, hand-tuned color system — backgrounds, text, and a six-color accent set for your syntax. Click any card to recolor this entire page, right now.</p>
+          <p>Every Sarala theme is a complete, hand-tuned color system — backgrounds, text, and a six-color accent set for your syntax. Thirteen ship with the app, or build your own from any base16 scheme. Click a card below to recolor this entire page, right now.</p>
         </div>
         <div class="theme-gallery">
           <div class="theme-card" data-set-theme="paper" style="background:#f3eee3;border-color:#e4dccb;color:#2b2620">
@@ -851,6 +894,7 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
         <div class="footer-col">
           <h5>Product</h5>
           <a href="#screenshots">Screenshots</a>
+          <a href="#ai">AI &amp; voice</a>
           <a href="#preview">Live preview</a>
           <a href="#features">Features</a>
           <a href="#themes">Themes</a>

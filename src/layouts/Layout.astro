@@ -14,7 +14,7 @@ const {
   title = "Sarala — A Markdown editor that gets out of your way",
   description = "Sarala is a free, open-source WYSIWYG Markdown editor that renders as you type — no preview pane, no split view. Live math, diagrams, syntax highlighting, and export to PDF, HTML, and more. For macOS, Windows & Linux.",
   path = "/",
-  ogImage = "/screenshots/hero-final.png",
+  ogImage = "/screenshots/og.png",
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL("https://sarala.solancer.com");
@@ -71,8 +71,8 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageAbs} />
-    <meta property="og:image:width" content="909" />
-    <meta property="og:image:height" content="540" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->

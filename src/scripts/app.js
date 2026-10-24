@@ -364,6 +364,20 @@
       s.addEventListener("click", function () { if (!dragged) openLb(i); });
     });
 
+    // Section screenshots (AI, voice) open in the same lightbox, on their own.
+    Array.prototype.slice.call(document.querySelectorAll("[data-zoom]")).forEach(function (fig) {
+      fig.addEventListener("click", function () {
+        var img = fig.querySelector("img");
+        var cap = fig.querySelector("figcaption");
+        lbImg.src = img.getAttribute("src");
+        lbImg.alt = img.getAttribute("alt") || "";
+        lbCap.textContent = cap ? cap.textContent : "";
+        lb.hidden = false;
+        requestAnimationFrame(function () { lb.classList.add("open"); });
+        document.body.style.overflow = "hidden";
+      });
+    });
+
     if (lb) {
       lb.addEventListener("click", function (e) {
         if (e.target === lb || e.target.closest(".lb-close")) closeLb();

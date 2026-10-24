@@ -666,7 +666,7 @@ code, kbd, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; 
 .you-badge { position: absolute; top: 18px; right: 18px; display: none; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
 .pcard.is-you .you-badge { display: inline-block; }
 .picon { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: var(--bg-elev); color: var(--fg); margin-bottom: 8px; }
-.picon svg { width: 24px; height: 24px; }
+.picon svg { width: 26px; height: 26px; }
 .pcard h3 { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
 .preq { color: var(--muted); font-size: 14.5px; line-height: 1.45; min-height: 2.9em; }
 .pdl { margin-top: 12px; width: 100%; }
@@ -677,6 +677,18 @@ code, kbd, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; 
 .palt a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
 .palt a:hover { text-decoration-color: var(--accent); }
 .pnote { color: var(--muted); font-size: 12.5px; }
+.pmeta code { font-size: 12.5px; padding: 2px 7px; border-radius: 6px; background: var(--bg-deep); border: 1px solid var(--border); color: var(--fg); }
+.distros { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 6px; margin-top: 8px; }
+.distros a {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 9px; border-radius: 11px; min-width: 0;
+  border: 1px solid var(--border); background: var(--bg); color: var(--fg); text-align: center;
+  transition: border-color .2s, transform .2s, background-color .2s;
+}
+.distros a:hover { border-color: var(--brand, var(--muted)); background: color-mix(in srgb, var(--brand, var(--fg)) 8%, var(--bg)); transform: translateY(-2px); }
+.distros svg { width: 22px; height: 22px; color: var(--brand, var(--muted)); }
+.distros .dn { font-size: 12px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.distros .df { font-size: 10px; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+@media (prefers-reduced-motion: reduce) { .distros a, .distros a:hover { transition: none; transform: none; } }
 
 /* circuit board guiding from the platform cards into the install help
    (traces are drawn by app.js at the real pixel width, so nothing distorts) */

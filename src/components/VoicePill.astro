@@ -1,0 +1,57 @@
+---
+/**
+ * Sarala's voice-typing pill (src/components/VoiceHud.tsx in the app),
+ * rebuilt in HTML so it stays sharp at any size: a screenshot crop of a
+ * 44px-tall control blurs when enlarged. Sized in em; set font-size to scale.
+ * Colours are the app's light Sarala theme, matching the screenshots.
+ */
+interface Props { class?: string }
+const { class: cls = "" } = Astro.props;
+const BARS = [0.35, 0.8, 0.55, 1, 0.7, 0.45, 0.9, 0.6, 0.3];
+---
+
+<span class={`vpill ${cls}`} aria-hidden="true">
+  <span class="vpill-dot"></span>
+  <span class="vpill-wave">
+    {BARS.map((h, i) => <span style={`--h:${h};--d:${(0.7 + (i % 4) * 0.17).toFixed(2)}s;--o:${(-i * 0.13).toFixed(2)}s`}></span>)}
+  </span>
+  <span class="vpill-time">0:04</span>
+  <span class="vpill-btn finish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span>
+  <span class="vpill-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg></span>
+</span>
+
+<style>
+  .vpill {
+    display: inline-flex; align-items: center; gap: 0.625em;
+    height: 2.75em; padding: 0 0.375em 0 1em;
+    font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1;
+    color: #2b2620; background: #fbf8f1;
+    border: 1px solid #e4dccb; border-radius: 999px;
+    box-shadow: 0 1.5em 3em -1em rgba(0, 0, 0, 0.55), 0 0.25em 0.75em -0.25em rgba(0, 0, 0, 0.18);
+    white-space: nowrap;
+  }
+  .vpill-dot {
+    width: 0.5625em; height: 0.5625em; flex: none; border-radius: 50%; background: #c4352a;
+    box-shadow: 0 0 0 0 rgba(196, 53, 42, 0.45);
+  }
+  .vpill-wave { display: inline-flex; align-items: center; gap: 0.1875em; height: 1.375em; }
+  .vpill-wave span {
+    width: 0.1875em; height: 100%; border-radius: 0.125em; background: #2b2620;
+    transform: scaleY(var(--h));
+  }
+  .vpill-time { min-width: 2.15em; color: #686155; font-size: 0.75em; font-variant-numeric: tabular-nums; }
+  .vpill-btn {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 2em; height: 2em; border-radius: 50%;
+    background: #eee8dc; color: #2b2620;
+  }
+  .vpill-btn.finish { margin-left: 0.25em; background: #8f4426; color: #fbf8f1; }
+  .vpill-btn svg { width: 0.9375em; height: 0.9375em; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .vpill-dot { animation: vpill-dot 1.6s ease-out infinite; }
+    .vpill-wave span { animation: vpill-bar var(--d) ease-in-out var(--o) infinite alternate; }
+  }
+  @keyframes vpill-dot { 70% { box-shadow: 0 0 0 0.45em rgba(196, 53, 42, 0); } }
+  @keyframes vpill-bar { from { transform: scaleY(0.18); } to { transform: scaleY(var(--h)); } }
+</style>

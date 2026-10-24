@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import VoicePill from "../components/VoicePill.astro";
 import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, MAC_APP_PATH } from "../consts";
 
 const LICENSE = `${GITHUB}/blob/main/LICENSE`;
@@ -91,13 +92,6 @@ const SHOWCASE = [
 
 ];
 
-/** Compact tiles at the foot of the writing bento. */
-const FEATURES = [
-  { icon: "image" as const, title: "Images that just work", text: "Paste or drop an image; it's saved next to your file." },
-  { icon: "md" as const, title: "GitHub-flavoured Markdown", text: "Footnotes, callouts, emoji and front matter." },
-  { icon: "keyboard" as const, title: "Keyboard first", text: "Shortcuts for everything, plus a / menu for blocks." },
-  { icon: "update" as const, title: "Always current", text: "Updates install from inside the app." },
-];
 
 const THEMES = [
   { id: "paper", dot: "#f3eee3", name: "Sarala", sub: "Warm parchment, light", bg: "#f3eee3", border: "#e4dccb", fg: "#2b2620", accent: "#9a4b28", on: "#fff8f2", sw: ["#a7402d", "#8b5629", "#785e18", "#3e6d41", "#33697c", "#735496"] },
@@ -197,7 +191,7 @@ const faqLd = {
             <img class="win win-left" src="/screenshots/crops/win-diagrams.webp" alt="A Kubernetes architecture note with a Mermaid flowchart rendered inline" width="1452" height="900" loading="eager" decoding="async" />
             <img class="win win-right" src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing edits to a runbook as diffs with Accept and Reject" width="1452" height="900" loading="eager" decoding="async" />
             <img class="win win-front" src="/screenshots/crops/hero-light.webp" alt="Sarala's live editor: a Markdown document with a callout, a table and a task list, rendered as you type" width="1452" height="900" fetchpriority="high" decoding="async" />
-            <img class="float f-voice" src="/screenshots/crops/voice-pill.webp" alt="" width="248" height="56" decoding="async" />
+            <VoicePill class="f-voice" />
 
             <span class="note note-front">diagrams from plain text<Fragment set:html={`<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 10c30 2 62 14 92 46"/><path d="M84 52l15 6-3-16"/></svg>`} /></span>
             <span class="note note-left">renders as you type<Fragment set:html={`<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 10c30 2 62 14 92 46"/><path d="M84 52l15 6-3-16"/></svg>`} /></span>
@@ -248,58 +242,51 @@ const faqLd = {
       </div>
     </section>
 
-    <!-- ============ AI ASSISTANT ============ -->
+    <!-- ============ NEW IN 1.3: AI + VOICE ============ -->
     <section class="section alt" id="ai" aria-labelledby="ai-title">
-      <div class="wrap split">
-        <div class="split-text reveal">
-          <div class="sec-head">
-            <span class="kicker">AI assistant</span>
-            <h2 id="ai-title">AI that edits only with your approval</h2>
-            <p>Ask an AI agent to review, summarise or rewrite your document. Every change arrives as a diff you accept or reject, and undo works as usual.</p>
-          </div>
-          <ul class="checks">
-            <li><span class="ck" set:html={svg("check")} /><div><h3>Every edit is a proposal</h3><p>Word-level diffs with Accept and Reject on each change, or accept them all at once.</p></div></li>
-            <li><span class="ck" set:html={svg("check")} /><div><h3>No API keys, no account</h3><p>Sarala runs the agent already installed on your computer, with its own sign-in.</p></div></li>
-            <li><span class="ck" set:html={svg("check")} /><div><h3>Your file stays untouched</h3><p>The agent works on a scratch copy. Nothing changes until you accept it.</p></div></li>
-          </ul>
-          <div class="badge-row" aria-label="Supported agents"><span class="badge">Claude Code</span><span class="badge">OpenAI Codex</span><span class="badge">GitHub Copilot CLI</span></div>
+      <div class="wrap">
+        <div class="sec-head center reveal">
+          <span class="kicker">New in 1.3</span>
+          <h2 id="ai-title">Help when you want it, and only then</h2>
+          <p>An AI assistant that proposes instead of overwriting, and voice typing that never leaves your computer.</p>
         </div>
-        <figure class="shot reveal">
-          <button type="button" data-zoom aria-label="Enlarge screenshot: the AI assistant proposing edits">
-            <img src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1452" height="900" loading="lazy" decoding="async" />
-          </button>
-          <figcaption>Proposed changes appear as diffs, block by block.</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <!-- ============ VOICE ============ -->
-    <section class="section" id="voice" aria-labelledby="voice-title">
-      <div class="wrap split rev">
-        <div class="split-text reveal">
-          <div class="sec-head">
-            <span class="kicker">Voice typing</span>
-            <h2 id="voice-title">Speak, and Sarala types. Fully offline.</h2>
-            <p>Hold a shortcut and talk. Speech becomes text on your own computer using an open model you download once, so nothing is uploaded.</p>
-          </div>
-          <ul class="checks">
-            <li><span class="ck" set:html={svg("check")} /><div><h3>Push to talk or tap to toggle</h3><p>A small pill shows the level and timer while you speak.</p></div></li>
-            <li><span class="ck" set:html={svg("check")} /><div><h3>Hands-free commands</h3><p>Say “new paragraph”, “scratch that” or “bold that” to edit without the keyboard.</p></div></li>
-            <li><span class="ck" set:html={svg("check")} /><div><h3>Ready in a minute</h3><p>Pick a language, check your microphone, choose a shortcut, and try it.</p></div></li>
-          </ul>
+        <div class="duo">
+          <article class="duo-card reveal">
+            <figure class="shot">
+              <button type="button" data-zoom aria-label="Enlarge screenshot: the AI assistant proposing edits">
+                <img src="/screenshots/crops/win-ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1452" height="900" loading="lazy" decoding="async" />
+              </button>
+            </figure>
+            <h3>AI assistant</h3>
+            <p>Ask an agent to review, summarise or rewrite. Every change arrives as a diff you accept or reject.</p>
+            <ul class="ticks">
+              <li><Fragment set:html={svg("check")} />Nothing changes until you accept it</li>
+              <li><Fragment set:html={svg("check")} />Uses the agent on your computer: no API keys</li>
+              <li><Fragment set:html={svg("check")} />Works on a scratch copy, never your file</li>
+            </ul>
+            <div class="badge-row" aria-label="Supported agents"><span class="badge">Claude Code</span><span class="badge">OpenAI Codex</span><span class="badge">GitHub Copilot CLI</span></div>
+          </article>
+          <article class="duo-card reveal" id="voice">
+            <figure class="shot">
+              <button type="button" data-zoom aria-label="Enlarge screenshot: voice typing">
+                <img src="/screenshots/crops/win-voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1452" height="900" loading="lazy" decoding="async" />
+              </button>
+              <VoicePill class="shot-pill" />
+            </figure>
+            <h3>Voice typing, fully offline</h3>
+            <p>Hold a shortcut and talk. An open speech model on your computer turns it into text; nothing is uploaded.</p>
+            <ul class="ticks">
+              <li><Fragment set:html={svg("check")} />Push to talk, or tap to start and stop</li>
+              <li><Fragment set:html={svg("check")} />Say “new paragraph” or “scratch that”</li>
+              <li><Fragment set:html={svg("check")} />Set up in a minute, with a live mic check</li>
+            </ul>
+          </article>
         </div>
-        <figure class="shot reveal">
-          <button type="button" data-zoom aria-label="Enlarge screenshot: voice typing">
-            <img src="/screenshots/crops/win-voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1452" height="900" loading="lazy" decoding="async" />
-          </button>
-          <img class="shot-pill" src="/screenshots/crops/voice-pill.webp" alt="" width="248" height="56" loading="lazy" decoding="async" />
-          <figcaption>Words appear as you speak, with no internet connection needed.</figcaption>
-        </figure>
       </div>
     </section>
 
     <!-- ============ WRITING (bento) ============ -->
-    <section class="section alt" id="writing" aria-labelledby="more-title">
+    <section class="section" id="writing" aria-labelledby="more-title">
       <div class="wrap">
         <div class="sec-head center reveal">
           <span class="kicker">For long sessions</span>
@@ -339,86 +326,39 @@ const faqLd = {
             <img class="tile-shot" src="/screenshots/crops/outline.webp" alt="The outline of a long Kafka guide next to the document, in the Night theme" width="808" height="870" loading="lazy" decoding="async" />
           </article>
 
-          <article class="tile t-export">
-            <span class="ti" set:html={svg("exportIcon")} />
-            <h3>Publish anywhere</h3>
-            <p>Export the same plain file to the format you need.</p>
-            <ul class="formats" aria-label="Export formats">
-              <li style="--c:var(--red)">PDF</li><li style="--c:var(--orange)">HTML</li><li style="--c:var(--blue)">Word</li><li style="--c:var(--green)">LaTeX</li><li style="--c:var(--purple)">EPUB</li><li style="--c:var(--yellow)">.md</li>
-            </ul>
-          </article>
-
-          <article class="tile t-settings">
+          <article class="tile t-settings" id="themes">
             <div class="tile-text">
               <span class="ti" set:html={svg("layers")} />
               <h3>Make it yours</h3>
-              <p>Your fonts, your shortcuts, and every option in one searchable place.</p>
+              <p>Thirteen light and dark themes, or your own from any base16 scheme, plus any font on your computer. Pick one to recolour this page.</p>
             </div>
-            <img class="tile-shot" src="/screenshots/crops/settings.webp" alt="Sarala's settings window on the Voice page" width="874" height="646" loading="lazy" decoding="async" />
+            <div class="theme-gallery">
+              {THEMES.map((t) => (
+                <button type="button" class="theme-card" data-set-theme={t.id} aria-pressed="false" style={`background:${t.bg};border-color:${t.border};color:${t.fg}`}>
+                  <span class="tc-name">{t.name}</span>
+                  <span class="tc-code" style="display:block"><span style={`color:${t.sw[0]}`}>#</span> Title<br /><span style={`color:${t.sw[1]}`}>**</span>bold<span style={`color:${t.sw[1]}`}>**</span></span>
+                  <span class="tc-swatches">{t.sw.map((c) => <i style={`background:${c}`}></i>)}</span>
+                </button>
+              ))}
+            </div>
           </article>
 
-          {FEATURES.map((f) => (
-            <article class="tile t-mini">
-              <span class="ti" set:html={svg(f.icon)} />
-              <div>
-                <h3>{f.title}</h3>
-                <p>{f.text}</p>
-              </div>
-            </article>
-          ))}
         </div>
-      </div>
-    </section>
-
-    <!-- ============ THEMES ============ -->
-    <section class="section" id="themes" aria-labelledby="themes-title">
-      <div class="wrap">
-        <div class="sec-head center reveal">
-          <span class="kicker">Themes</span>
-          <h2 id="themes-title">Pick a look. The whole app follows.</h2>
-          <p>Thirteen light and dark themes ship with Sarala, or import your own. Choose one below to recolour this page.</p>
-        </div>
-        <div class="theme-gallery reveal" data-stagger>
-          {THEMES.map((t) => (
-            <button type="button" class="theme-card" data-set-theme={t.id} aria-pressed="false" style={`background:${t.bg};border-color:${t.border};color:${t.fg}`}>
-              <span class="tc-on" style={`background:${t.accent};color:${t.on}`}>Active</span>
-              <span class="tc-name">{t.name}</span>
-              <span class="tc-sub" style="display:block">{t.sub}</span>
-              <span class="tc-code" style="display:block"><span style={`color:${t.sw[0]}`}>#</span> Heading<br /><span style={`color:${t.sw[1]}`}>**</span>bold<span style={`color:${t.sw[1]}`}>**</span> · <span style={`color:${t.sw[5]}`}>`code`</span></span>
-              <span class="tc-swatches">{t.sw.map((c) => <i style={`background:${c}`}></i>)}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ OPEN SOURCE ============ -->
-    <section class="section alt" id="opensource" aria-labelledby="oss-title">
-      <div class="wrap oss">
-        <div class="sec-head reveal">
-          <span class="kicker">Open source</span>
-          <h2 id="oss-title">Free, private, and yours to change</h2>
-          <p>Sarala is released under the GNU GPL-3.0. Read every line, build it yourself, or fork it. Issues and pull requests are welcome.</p>
-          <div class="oss-actions">
-            <a class="btn btn-primary" href={GITHUB} target="_blank" rel="noopener"><Fragment set:html={svg("github", "ico")} />Star on GitHub</a>
-            <a class="btn btn-ghost" href={CONTRIBUTING} target="_blank" rel="noopener">Contributing guide</a>
-          </div>
-        </div>
-        <ul class="oss-list reveal" data-stagger>
-          <li><span class="pi" set:html={svg("shield")} /><div><h3>No telemetry</h3><p>Sarala never reports what you write or how you use it. You can check the code.</p></div></li>
-          <li><span class="pi" set:html={svg("heart")} /><div><h3>No paid tier</h3><p>Every feature is in the free download. No licence keys, no subscription.</p></div></li>
-          <li><span class="pi" set:html={svg("hdd")} /><div><h3>Plain files you own</h3><p>Documents are .md files in folders you choose. Open them anywhere, keep them in Git, sync them however you like.</p></div></li>
-        </ul>
       </div>
     </section>
 
     <!-- ============ DOWNLOAD ============ -->
-    <section class="section download-sec" id="download" aria-labelledby="dl-title">
+    <section class="section alt download-sec" id="download" aria-labelledby="dl-title">
       <div class="wrap">
         <div class="dl-head reveal">
           <span class="kicker">Download</span>
           <h2 id="dl-title">Get Sarala</h2>
-          <p>Free for macOS, Windows and Linux. Version {VERSION}.</p>
+          <p>Free and open source (GPL-3.0) for macOS, Windows and Linux.</p>
+          <ul class="trust" aria-label="Why it's safe to try">
+            <li><Fragment set:html={svg("shield")} />No telemetry, no account</li>
+            <li><Fragment set:html={svg("heart")} />No paid tier, ever</li>
+            <li><Fragment set:html={svg("hdd")} />Plain .md files you own</li>
+          </ul>
         </div>
             <div class="dl-picker" id="dl-picker" role="tablist" aria-label="Choose your operating system">
               <span class="dl-thumb" id="dl-thumb" aria-hidden="true"></span>
@@ -519,7 +459,7 @@ const faqLd = {
     </section>
 
     <!-- ============ FAQ ============ -->
-    <section class="section alt" id="faq" aria-labelledby="faq-title">
+    <section class="section" id="faq" aria-labelledby="faq-title">
       <div class="wrap">
         <div class="sec-head center reveal">
           <span class="kicker">FAQ</span>

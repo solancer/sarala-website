@@ -285,7 +285,7 @@ const faqLd = {
       </div>
     </section>
 
-    <!-- ============ WRITING (bento) ============ -->
+    <!-- ============ WRITING (feature tour) ============ -->
     <section class="section" id="writing" aria-labelledby="more-title">
       <div class="wrap">
         <div class="sec-head center reveal">
@@ -294,55 +294,53 @@ const faqLd = {
           <p>Everything that keeps you in flow, and nothing that pulls you out of it.</p>
         </div>
 
-        <div class="bento reveal" data-stagger>
-          <article class="tile tile-photo t-focus">
-            <img class="tile-bg" src="/screenshots/crops/desk-night.webp" alt="" width="900" height="1069" loading="lazy" decoding="async" />
-            <div class="tile-body">
-              <span class="chip">Focus &amp; typewriter modes</span>
-              <h3>Dim the room.<br />Keep the words.</h3>
-              <p>Focus mode fades everything but the paragraph you're writing, and typewriter scrolling keeps your line in the middle of the screen.</p>
-              <div class="focus-demo" aria-hidden="true">
-                <span style="width:78%"></span><span style="width:92%"></span><span class="on" style="width:86%"></span><span style="width:70%"></span><span style="width:84%"></span>
-              </div>
-            </div>
-            <small class="credit">Photo: <a href="https://unsplash.com/photos/a-dimly-lit-desk-with-a-laptop-and-monitor-IUKdnYUlDco" target="_blank" rel="noopener">Zoshua Colah</a> on Unsplash</small>
-          </article>
-
-          <article class="tile t-palette">
-            <div class="tile-text">
+        <div class="flow reveal">
+          <div class="flow-list" role="tablist" aria-orientation="vertical" aria-label="Writing features">
+            <button type="button" class="flow-item" role="tab" id="flow-tab-focus" aria-controls="flow-focus" aria-selected="true" tabindex="0">
+              <span class="ti" set:html={svg("eye")} />
+              <span class="flow-copy"><span class="flow-title">Focus and typewriter modes</span><span class="flow-desc">Fade everything but the paragraph you're writing, and keep your line in the middle of the screen.</span></span>
+            </button>
+            <button type="button" class="flow-item" role="tab" id="flow-tab-palette" aria-controls="flow-palette" aria-selected="false" tabindex="-1">
               <span class="ti" set:html={svg("command")} />
-              <h3>One shortcut for everything</h3>
-              <p>Press <kbd>⌘</kbd><kbd>K</kbd> to run any command, switch theme, or jump to a file or heading without touching the mouse.</p>
-            </div>
-            <img class="tile-shot" src="/screenshots/crops/palette.webp" alt="The command palette filtered to theme commands" width="608" height="444" loading="lazy" decoding="async" />
-          </article>
-
-          <article class="tile t-outline">
-            <div class="tile-text">
+              <span class="flow-copy"><span class="flow-title">One shortcut for everything</span><span class="flow-desc">Press ⌘K to run any command, switch theme, or jump to a file or heading.</span></span>
+            </button>
+            <button type="button" class="flow-item" role="tab" id="flow-tab-outline" aria-controls="flow-outline" aria-selected="false" tabindex="-1">
               <span class="ti" set:html={svg("tree")} />
-              <h3>Find your way in long documents</h3>
-              <p>A live outline of every heading, a file tree for your folder, and search across all of it.</p>
-            </div>
-            <img class="tile-shot" src="/screenshots/crops/outline.webp" alt="The outline of a long Kafka guide next to the document, in the Night theme" width="808" height="870" loading="lazy" decoding="async" />
-          </article>
-
-          <article class="tile t-settings" id="themes">
-            <div class="tile-text">
+              <span class="flow-copy"><span class="flow-title">Outline, files and search</span><span class="flow-desc">Jump between headings in long documents, browse your folder, and search all of it.</span></span>
+            </button>
+            <button type="button" class="flow-item" role="tab" id="flow-tab-themes" aria-controls="themes" aria-selected="false" tabindex="-1">
               <span class="ti" set:html={svg("layers")} />
-              <h3>Make it yours</h3>
-              <p>Thirteen light and dark themes, or your own from any base16 scheme, plus any font on your computer. Pick one to recolour this page.</p>
-            </div>
-            <div class="theme-gallery">
-              {THEMES.map((t) => (
-                <button type="button" class="theme-card" data-set-theme={t.id} aria-pressed="false" style={`background:${t.bg};border-color:${t.border};color:${t.fg}`}>
-                  <span class="tc-name">{t.name}</span>
-                  <span class="tc-code" style="display:block"><span style={`color:${t.sw[0]}`}>#</span> Title<br /><span style={`color:${t.sw[1]}`}>**</span>bold<span style={`color:${t.sw[1]}`}>**</span></span>
-                  <span class="tc-swatches">{t.sw.map((c) => <i style={`background:${c}`}></i>)}</span>
-                </button>
-              ))}
-            </div>
-          </article>
+              <span class="flow-copy"><span class="flow-title">Make it yours</span><span class="flow-desc">Thirteen light and dark themes, or your own, and any font on your computer.</span></span>
+            </button>
+          </div>
 
+          <div class="flow-stage">
+            <div class="flow-panel flow-photo" role="tabpanel" id="flow-focus" aria-labelledby="flow-tab-focus">
+              <img class="flow-bg" src="/screenshots/crops/desk-night.webp" alt="" width="900" height="1069" loading="lazy" decoding="async" />
+              <div class="focus-demo" aria-hidden="true">
+                <span style="width:72%"></span><span style="width:90%"></span><span class="on" style="width:84%"></span><span style="width:66%"></span><span style="width:80%"></span>
+              </div>
+              <small class="credit">Photo: <a href="https://unsplash.com/photos/a-dimly-lit-desk-with-a-laptop-and-monitor-IUKdnYUlDco" target="_blank" rel="noopener">Zoshua Colah</a> on Unsplash</small>
+            </div>
+            <div class="flow-panel" role="tabpanel" id="flow-palette" aria-labelledby="flow-tab-palette" hidden>
+              <img class="flow-shot" src="/screenshots/crops/palette.webp" alt="The command palette filtered to theme commands" width="608" height="444" loading="lazy" decoding="async" />
+            </div>
+            <div class="flow-panel" role="tabpanel" id="flow-outline" aria-labelledby="flow-tab-outline" hidden>
+              <img class="flow-shot flow-shot-wide" src="/screenshots/crops/outline.webp" alt="The outline of a long Kafka guide next to the document, in the Night theme" width="808" height="870" loading="lazy" decoding="async" />
+            </div>
+            <div class="flow-panel" role="tabpanel" id="themes" aria-labelledby="flow-tab-themes" hidden>
+              <div class="theme-gallery">
+                {THEMES.map((t) => (
+                  <button type="button" class="theme-card" data-set-theme={t.id} aria-pressed="false" style={`background:${t.bg};border-color:${t.border};color:${t.fg}`}>
+                    <span class="tc-name">{t.name}</span>
+                    <span class="tc-code" style="display:block"><span style={`color:${t.sw[0]}`}>#</span> Title<br /><span style={`color:${t.sw[1]}`}>**</span>bold<span style={`color:${t.sw[1]}`}>**</span></span>
+                    <span class="tc-swatches">{t.sw.map((c) => <i style={`background:${c}`}></i>)}</span>
+                  </button>
+                ))}
+              </div>
+              <p class="flow-hint">Pick a theme to recolour this page.</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

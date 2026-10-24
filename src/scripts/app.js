@@ -56,6 +56,17 @@
     }
   }
 
+  /* ---------- #themes lives in a tab panel: open it when linked to ---------- */
+  function openThemes() {
+    if (location.hash !== "#themes") return;
+    var tab = document.getElementById("flow-tab-themes");
+    if (!tab) return;
+    tab.click();
+    var flow = tab.closest(".flow");
+    if (flow) requestAnimationFrame(function () { flow.scrollIntoView({ block: "center" }); });
+  }
+  window.addEventListener("hashchange", openThemes);
+
   /* ---------- HERO STAGE: fan the windows out once the page settles ---------- */
   var stage = document.querySelector(".stage");
   if (stage) {
@@ -78,7 +89,7 @@
   }
 
   /* ---------- SHOWCASE TABS (WAI-ARIA tabs pattern) ---------- */
-  document.querySelectorAll('[role="tablist"].tabs').forEach(function (list) {
+  document.querySelectorAll('[role="tablist"].tabs, [role="tablist"].flow-list').forEach(function (list) {
     var tabs = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
     function select(tab, focus) {
       tabs.forEach(function (t) {
@@ -94,8 +105,8 @@
       tab.addEventListener("click", function () { select(tab, false); });
       tab.addEventListener("keydown", function (e) {
         var next = null;
-        if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
-        else if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") next = tabs[(i + 1) % tabs.length];
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = tabs[(i - 1 + tabs.length) % tabs.length];
         else if (e.key === "Home") next = tabs[0];
         else if (e.key === "End") next = tabs[tabs.length - 1];
         if (!next) return;
@@ -244,4 +255,5 @@
       }
     });
   }
+  openThemes();
 })();

@@ -654,8 +654,8 @@ code, kbd, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; 
 /* ============================================================
    DOWNLOAD: one card per platform + install help
    ============================================================ */
-.pgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 40px; text-align: left; }
-@media (max-width: 900px) { .pgrid { grid-template-columns: minmax(0, 1fr); max-width: 520px; margin-inline: auto; } }
+.pgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 40px; text-align: left; position: relative; z-index: 1; }
+@media (max-width: 900px) { .pgrid { grid-template-columns: minmax(0, 1fr); max-width: 520px; margin-inline: auto; } .help { margin-top: 24px; } }
 .pcard {
   position: relative; display: flex; flex-direction: column; gap: 6px;
   padding: 26px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel);
@@ -678,7 +678,30 @@ code, kbd, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; 
 .palt a:hover { text-decoration-color: var(--accent); }
 .pnote { color: var(--muted); font-size: 12.5px; }
 
-.help { margin: 28px auto 0; text-align: left; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel); overflow: hidden; }
+/* circuit traces guiding from the platform cards into the install help */
+.circuit { position: relative; height: 72px; margin: 0 auto -1px; pointer-events: none; }
+.circuit svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.circuit path { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.circuit .traces path { stroke: var(--border); transition: stroke .4s; }
+.circuit .pulses path { stroke: var(--accent); opacity: 0; transition: opacity .4s; stroke-dasharray: 14 86; stroke-dashoffset: 100; }
+.circuit[data-active="mac"] .traces [data-os="mac"],
+.circuit[data-active="win"] .traces [data-os="win"],
+.circuit[data-active="linux"] .traces [data-os="linux"] { stroke: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+.circuit[data-active="mac"] .pulses [data-os="mac"],
+.circuit[data-active="win"] .pulses [data-os="win"],
+.circuit[data-active="linux"] .pulses [data-os="linux"] { opacity: 1; filter: drop-shadow(0 0 4px var(--accent)); }
+@media (prefers-reduced-motion: no-preference) {
+  .circuit .pulses path { animation: circuitPulse 2.4s cubic-bezier(.45,.05,.55,.95) infinite; }
+}
+@media (prefers-reduced-motion: reduce) { .circuit .pulses path { stroke-dasharray: none; stroke-dashoffset: 0; opacity: 0; } .circuit[data-active] .pulses path { opacity: 0; } .circuit[data-active="mac"] .traces [data-os="mac"], .circuit[data-active="win"] .traces [data-os="win"], .circuit[data-active="linux"] .traces [data-os="linux"] { stroke: var(--accent); } }
+@keyframes circuitPulse { from { stroke-dashoffset: 100; } to { stroke-dashoffset: -14; } }
+/* solder pads under each card, and the pin where the traces land */
+.circuit .pad { position: absolute; top: -4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--border); transition: border-color .4s, background-color .4s, box-shadow .4s; }
+.circuit[data-active="mac"] .pad[data-os="mac"], .circuit[data-active="win"] .pad[data-os="win"], .circuit[data-active="linux"] .pad[data-os="linux"] { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.circuit .pin { position: absolute; left: 50%; bottom: -5px; width: 96px; height: 10px; margin-left: -48px; border-radius: 6px; background: var(--bg-panel); border: 1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border)); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent); z-index: 1; }
+@media (max-width: 900px) { .circuit { display: none; } }
+
+.help { margin: 0 auto; text-align: left; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel); overflow: hidden; }
 .help-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px 22px; border-bottom: 1px solid var(--border); }
 .help-head h3 { font-size: 18px; font-weight: 800; }
 .help-tabs { margin: 0; }

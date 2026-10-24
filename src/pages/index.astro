@@ -124,9 +124,9 @@ const PLATFORMS = [
   },
   {
     key: "linux" as const, label: "Linux", req: "64-bit · Ubuntu, Debian, Fedora and more",
-    cta: "Download AppImage", build: BUILDS.linux,
+    cta: "Download .deb", build: { file: ALT.deb, size: ALT_SIZE.deb },
     alts: [
-      { label: ".deb", href: `${DL}/${ALT.deb}`, note: ALT_SIZE.deb },
+      { label: "AppImage", href: `${DL}/${BUILDS.linux.file}`, note: BUILDS.linux.size },
       { label: ".rpm", href: `${DL}/${ALT.rpm}`, note: ALT_SIZE.rpm },
       { label: "Snap", href: SNAP, note: "" },
     ],
@@ -135,9 +135,9 @@ const PLATFORMS = [
 
 /** Linux one-liners, per package format. */
 const LINUX_CMDS = [
-  { id: "lx-appimage", label: "AppImage (any distribution)", cmd: `chmod +x ${BUILDS.linux.file} && ./${BUILDS.linux.file}` },
-  { id: "lx-deb", label: "Ubuntu, Debian, Mint", cmd: `sudo apt install ./${ALT.deb}` },
-  { id: "lx-rpm", label: "Fedora, RHEL, openSUSE", cmd: `sudo dnf install ./${ALT.rpm}` },
+  { id: "lx-deb", label: "Ubuntu, Debian, Mint (.deb)", cmd: `sudo apt install ./${ALT.deb}` },
+  { id: "lx-rpm", label: "Fedora, RHEL, openSUSE (.rpm)", cmd: `sudo dnf install ./${ALT.rpm}` },
+  { id: "lx-appimage", label: "Any distribution (AppImage)", cmd: `chmod +x ${BUILDS.linux.file} && ./${BUILDS.linux.file}` },
   { id: "lx-snap", label: "Snap Store", cmd: "sudo snap install sarala" },
 ];
 
@@ -421,6 +421,25 @@ const faqLd = {
           ))}
         </div>
 
+        <div class="circuit" aria-hidden="true" data-active="mac">
+          <svg viewBox="0 0 1200 96" preserveAspectRatio="none">
+            <g class="traces">
+              <path data-os="mac"   d="M200 0 V30 Q200 44 214 44 H546 Q560 44 560 58 V96" />
+              <path data-os="win"   d="M600 0 V96" />
+              <path data-os="linux" d="M1000 0 V30 Q1000 44 986 44 H654 Q640 44 640 58 V96" />
+            </g>
+            <g class="pulses">
+              <path data-os="mac"   pathLength="100" d="M200 0 V30 Q200 44 214 44 H546 Q560 44 560 58 V96" />
+              <path data-os="win"   pathLength="100" d="M600 0 V96" />
+              <path data-os="linux" pathLength="100" d="M1000 0 V30 Q1000 44 986 44 H654 Q640 44 640 58 V96" />
+            </g>
+          </svg>
+          <span class="pad" data-os="mac" style="left:16.667%"></span>
+          <span class="pad" data-os="win" style="left:50%"></span>
+          <span class="pad" data-os="linux" style="left:83.333%"></span>
+          <span class="pin"></span>
+        </div>
+
         <div class="help reveal" id="install-help">
           <div class="help-head">
             <h3>Installing</h3>
@@ -435,14 +454,6 @@ const faqLd = {
 
           <div class="help-panel" role="tabpanel" id="help-mac" aria-labelledby="help-tab-mac">
             <div class="help-cols">
-              <section aria-labelledby="brew-title" id="macos-homebrew">
-                <h4 id="brew-title">With Homebrew <span class="way-tag">Recommended</span></h4>
-                <p>No security prompt, and <code>brew upgrade</code> keeps Sarala up to date.</p>
-                <div class="cmd">
-                  <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
-                  <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>
-                </div>
-              </section>
               <section aria-labelledby="gk-title" id="macos-first-launch">
                 <h4 id="gk-title">With the .dmg</h4>
                 <p>Sarala isn't notarized by Apple, so macOS blocks the first launch. One command clears it.</p>
@@ -462,6 +473,14 @@ const faqLd = {
                   </ol>
                   <p class="fine">On macOS 14 or older, right-click Sarala and choose <b>Open</b>. A "Sarala is damaged" message is the same warning, and either route clears it.</p>
                 </details>
+              </section>
+              <section aria-labelledby="brew-title" id="macos-homebrew">
+                <h4 id="brew-title">With Homebrew <span class="way-tag">Recommended</span></h4>
+                <p>No security prompt, and <code>brew upgrade</code> keeps Sarala up to date.</p>
+                <div class="cmd">
+                  <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
+                  <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>
+                </div>
               </section>
             </div>
           </div>

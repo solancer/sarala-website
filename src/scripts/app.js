@@ -164,10 +164,21 @@
     var mine = document.querySelector('.pcard[data-os="' + detectedOS + '"]');
     if (mine) mine.classList.add("is-you");
   }
+  var circuit = document.querySelector(".circuit");
   function openHelp(os) {
     var tab = document.getElementById("help-tab-" + os);
     if (tab && tab.getAttribute("aria-selected") !== "true") tab.click();
   }
+  // The lit trace follows whichever platform's help is showing.
+  ["mac", "win", "linux"].forEach(function (os) {
+    var tab = document.getElementById("help-tab-" + os);
+    if (tab && circuit) tab.addEventListener("click", function () { circuit.setAttribute("data-active", os); });
+  });
+  var helpList = document.querySelector(".help-tabs");
+  if (helpList && circuit) helpList.addEventListener("keyup", function () {
+    var on = helpList.querySelector('[aria-selected="true"]');
+    if (on) circuit.setAttribute("data-active", on.id.replace("help-tab-", ""));
+  });
   openHelp(helpOS);
   // In-page links into a help panel (#help-mac from the Homebrew link, or the
   // long-standing /#macos-first-launch deep link) open the right tab first.

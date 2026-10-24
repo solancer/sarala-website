@@ -56,17 +56,11 @@
     }
   }
 
-  /* ---------- HERO DEMO: Live / Source ---------- */
-  var demo = document.getElementById("demo-app");
-  if (demo) {
-    var modeBtns = demo.querySelectorAll("[data-demo-mode]");
-    modeBtns.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var mode = btn.getAttribute("data-demo-mode");
-        demo.setAttribute("data-mode", mode);
-        modeBtns.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
-      });
-    });
+  /* ---------- HERO STAGE: fan the windows out once the page settles ---------- */
+  var stage = document.querySelector(".stage");
+  if (stage) {
+    var fan = function () { setTimeout(function () { stage.classList.add("fanned"); }, 350); };
+    if (document.readyState === "complete") fan(); else window.addEventListener("load", fan);
   }
 
   /* ---------- VISITOR'S OS (hero button + download picker) ---------- */

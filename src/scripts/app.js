@@ -165,20 +165,67 @@
     if (mine) mine.classList.add("is-you");
   }
   var circuit = document.querySelector(".circuit");
+  var OS_NAME = { mac: "macOS", win: "Windows", linux: "Linux" };
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Route one PCB-style trace from each platform card down to the chip:
+  // straight down, a 45-degree chamfer, across, another chamfer, down.
+  function drawCircuit() {
+    if (!circuit) return;
+    var svg = circuit.querySelector(".circuit-svg");
+    var box = circuit.getBoundingClientRect();
+    if (!box.width) return;
+    var NS = "http://www.w3.org/2000/svg", H = box.height, mid = box.width / 2;
+    var active = circuit.getAttribute("data-active");
+    var lanes = { mac: -34, win: 0, linux: 34 };
+    var out = "";
+    document.querySelectorAll(".pcard").forEach(function (card) {
+      var os = card.getAttribute("data-os");
+      var r = card.getBoundingClientRect();
+      var x = r.left + r.width / 2 - box.left, t = mid + lanes[os], c = 12, y1 = 22, y2 = 46;
+      var d;
+      if (Math.abs(x - t) < 2) d = "M" + x + " 0 V" + H;
+      else {
+        var dir = t > x ? 1 : -1;
+        d = "M" + x + " 0 V" + y1 + " L" + (x + dir * c) + " " + (y1 + c) + " H" + (t - dir * c) + " L" + t + " " + (y2) + " V" + H;
+      }
+      var on = os === active;
+      if (on) out += '<path class="glow" d="' + d + '"/>';
+      out += '<path class="trace' + (on ? " on" : "") + '" id="ct-' + os + '" d="' + d + '"/>';
+      if (on) {
+        out += '<path class="beam" pathLength="100" d="' + d + '"/>';
+        if (!reduceMotion) for (var k = 0; k < 2; k++)
+          out += '<circle class="packet" r="2.2"><animateMotion dur="2.6s" begin="' + (k * 1.3) + 's" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#ct-' + os + '"/></animateMotion></circle>';
+      }
+      out += '<circle class="via' + (on ? " on" : "") + '" cx="' + x + '" cy="' + 1 + '" r="3.5"/>';
+      if (Math.abs(x - t) >= 2) out += '<circle class="via' + (on ? " on" : "") + '" cx="' + t + '" cy="' + y2 + '" r="2.6"/>';
+    });
+    svg.setAttribute("viewBox", "0 0 " + box.width + " " + H);
+    svg.innerHTML = out;
+    var label = circuit.querySelector(".chip-label b");
+    if (label) label.textContent = OS_NAME[active] || "";
+  }
+  function setCircuit(os) { if (circuit) { circuit.setAttribute("data-active", os); drawCircuit(); } }
   function openHelp(os) {
     var tab = document.getElementById("help-tab-" + os);
     if (tab && tab.getAttribute("aria-selected") !== "true") tab.click();
+    setCircuit(os);
   }
   // The lit trace follows whichever platform's help is showing.
   ["mac", "win", "linux"].forEach(function (os) {
     var tab = document.getElementById("help-tab-" + os);
-    if (tab && circuit) tab.addEventListener("click", function () { circuit.setAttribute("data-active", os); });
+    if (tab) tab.addEventListener("click", function () { setCircuit(os); });
   });
   var helpList = document.querySelector(".help-tabs");
-  if (helpList && circuit) helpList.addEventListener("keyup", function () {
+  if (helpList) helpList.addEventListener("keyup", function () {
     var on = helpList.querySelector('[aria-selected="true"]');
-    if (on) circuit.setAttribute("data-active", on.id.replace("help-tab-", ""));
+    if (on) setCircuit(on.id.replace("help-tab-", ""));
   });
+  if (circuit && "ResizeObserver" in window) new ResizeObserver(drawCircuit).observe(circuit);
+  window.addEventListener("load", drawCircuit);
+  // The cards slide in on scroll; re-measure once they've settled.
+  if (circuit && "IntersectionObserver" in window) new IntersectionObserver(function (es) {
+    if (es[0].isIntersecting) { setTimeout(drawCircuit, 300); setTimeout(drawCircuit, 1200); }
+  }).observe(circuit);
   openHelp(helpOS);
   // In-page links into a help panel (#help-mac from the Homebrew link, or the
   // long-standing /#macos-first-launch deep link) open the right tab first.

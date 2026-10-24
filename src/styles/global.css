@@ -678,27 +678,39 @@ code, kbd, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; 
 .palt a:hover { text-decoration-color: var(--accent); }
 .pnote { color: var(--muted); font-size: 12.5px; }
 
-/* circuit traces guiding from the platform cards into the install help */
-.circuit { position: relative; height: 72px; margin: 0 auto -1px; pointer-events: none; }
-.circuit svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.circuit path { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
-.circuit .traces path { stroke: var(--border); transition: stroke .4s; }
-.circuit .pulses path { stroke: var(--accent); opacity: 0; transition: opacity .4s; stroke-dasharray: 14 86; stroke-dashoffset: 100; }
-.circuit[data-active="mac"] .traces [data-os="mac"],
-.circuit[data-active="win"] .traces [data-os="win"],
-.circuit[data-active="linux"] .traces [data-os="linux"] { stroke: color-mix(in srgb, var(--accent) 45%, var(--border)); }
-.circuit[data-active="mac"] .pulses [data-os="mac"],
-.circuit[data-active="win"] .pulses [data-os="win"],
-.circuit[data-active="linux"] .pulses [data-os="linux"] { opacity: 1; filter: drop-shadow(0 0 4px var(--accent)); }
-@media (prefers-reduced-motion: no-preference) {
-  .circuit .pulses path { animation: circuitPulse 2.4s cubic-bezier(.45,.05,.55,.95) infinite; }
+/* circuit board guiding from the platform cards into the install help
+   (traces are drawn by app.js at the real pixel width, so nothing distorts) */
+.circuit { position: relative; height: 92px; margin: 0 auto -1px; pointer-events: none; }
+.circuit::before {
+  content: ""; position: absolute; inset: 0 4%; opacity: .55;
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1.4px); background-size: 14px 14px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 50%, #000 30%, transparent 75%);
+          mask-image: radial-gradient(ellipse 60% 90% at 50% 50%, #000 30%, transparent 75%);
 }
-@media (prefers-reduced-motion: reduce) { .circuit .pulses path { stroke-dasharray: none; stroke-dashoffset: 0; opacity: 0; } .circuit[data-active] .pulses path { opacity: 0; } .circuit[data-active="mac"] .traces [data-os="mac"], .circuit[data-active="win"] .traces [data-os="win"], .circuit[data-active="linux"] .traces [data-os="linux"] { stroke: var(--accent); } }
-@keyframes circuitPulse { from { stroke-dashoffset: 100; } to { stroke-dashoffset: -14; } }
-/* solder pads under each card, and the pin where the traces land */
-.circuit .pad { position: absolute; top: -4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--border); transition: border-color .4s, background-color .4s, box-shadow .4s; }
-.circuit[data-active="mac"] .pad[data-os="mac"], .circuit[data-active="win"] .pad[data-os="win"], .circuit[data-active="linux"] .pad[data-os="linux"] { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-.circuit .pin { position: absolute; left: 50%; bottom: -5px; width: 96px; height: 10px; margin-left: -48px; border-radius: 6px; background: var(--bg-panel); border: 1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border)); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent); z-index: 1; }
+.circuit-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.circuit-svg .trace { fill: none; stroke: var(--border); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; transition: stroke .4s; }
+.circuit-svg .trace.on { stroke: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.circuit-svg .glow { fill: none; stroke: var(--accent); stroke-width: 6; opacity: .14; filter: blur(3px); }
+.circuit-svg .beam { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 10 90; filter: drop-shadow(0 0 4px var(--accent)); }
+.circuit-svg .via { fill: var(--bg); stroke: var(--border); stroke-width: 1.5; transition: stroke .4s, fill .4s; }
+.circuit-svg .via.on { stroke: var(--accent); fill: color-mix(in srgb, var(--accent) 25%, var(--bg)); }
+.circuit-svg .packet { fill: #fff; filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 7px var(--accent)); }
+@media (prefers-reduced-motion: no-preference) { .circuit-svg .beam { animation: circuitBeam 2.2s cubic-bezier(.45,.05,.55,.95) infinite; } }
+@keyframes circuitBeam { from { stroke-dashoffset: 100; } to { stroke-dashoffset: -10; } }
+.chip {
+  position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); z-index: 1;
+  padding: 3px 12px 4px; border-radius: 7px; background: var(--bg-panel);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 60%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent), 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent);
+  font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap;
+}
+.chip b { color: var(--accent); font-weight: 600; }
+.chip::before { /* pins along the top edge */
+  content: ""; position: absolute; left: 10px; right: 10px; top: -6px; height: 5px;
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, var(--border)) 0 2px, transparent 2px 9px);
+}
+@media (prefers-reduced-motion: no-preference) { .chip { animation: chipHum 3s ease-in-out infinite; } }
+@keyframes chipHum { 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent), 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent); } }
 @media (max-width: 900px) { .circuit { display: none; } }
 
 .help { margin: 0 auto; text-align: left; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-panel); overflow: hidden; }

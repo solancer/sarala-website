@@ -10,7 +10,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       // The promo reel is a noindex recording surface, not indexable content.
-      filter: (page) => !page.includes("/promo"),
+      filter: (page) => !page.includes("/promo") && !page.includes("/404"),
     }),
   ],
   build: {

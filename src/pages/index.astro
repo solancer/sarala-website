@@ -5,652 +5,501 @@ import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, MAC_APP_PATH } from "
 const LICENSE = `${GITHUB}/blob/main/LICENSE`;
 const ISSUES = `${GITHUB}/issues`;
 const CONTRIBUTING = `${GITHUB}/blob/main/CONTRIBUTING.md`;
-
 const QUARANTINE_CMD = `xattr -dr com.apple.quarantine ${MAC_APP_PATH}`;
-
-/**
- * The screenshot carousel, in order. Real captures from the app (the
- * `showcase/` folder in this repo is the workspace they were taken in), framed
- * at 1680×1125. Add a shot by adding a line.
- */
-const SHOTS = [
-  { file: "live-editor", alt: "Sarala's live editor with a folder open: tables, callouts, highlights and task lists rendered as you type", cap: "Live editor · your folder, rendered as you type" },
-  { file: "ai-assistant", alt: "The AI assistant proposing two edits to a Kubernetes runbook, shown as diffs with Accept and Reject", cap: "AI assistant · every edit is a diff you approve" },
-  { file: "voice-typing", alt: "Voice typing in Sarala: a recording pill with a live waveform while words stream into the document", cap: "Voice typing · offline, on your machine" },
-  { file: "diagrams", alt: "A Mermaid flowchart of a Kubernetes request path rendered inline in Sarala", cap: "Diagrams · Mermaid and D2, rendered inline" },
-  { file: "runbook", alt: "A Mermaid sequence diagram of a rolling update in a Kubernetes runbook", cap: "Runbooks · sequence diagrams, callouts and code" },
-  { file: "math", alt: "Queueing-theory equations rendered with KaTeX in Sarala", cap: "Math · LaTeX rendered live with KaTeX" },
-  { file: "code", alt: "A syntax-highlighted Java Kafka producer in Sarala's Night theme, with the outline beside it", cap: "Code · syntax highlighting in 100+ languages" },
-  { file: "dark-mode", alt: "A long Kafka guide in Sarala's Night theme with the document outline", cap: "Dark mode · Night theme with live outline" },
-  { file: "tables", alt: "A settings table, rollout checklist and warning callout in the GitHub theme", cap: "Tables, tasks & callouts · GitHub theme" },
-  { file: "command-palette", alt: "The command palette listing themes with colour swatches", cap: "Command palette · every action, one keystroke away" },
-  { file: "themes", alt: "Sarala's theme gallery with thirteen light and dark themes", cap: "Themes · thirteen built in, or build your own" },
-];
-
-/** The Homebrew route: tap the repo, trust the cask once, install. */
 const BREW_CMDS = [
   `brew tap solancer/sarala ${GITHUB}`,
   "brew trust --cask solancer/sarala/sarala",
   "brew install --cask --yes sarala",
 ];
+
+/** Lucide-style icons (24px grid, stroke) used across the page. */
+const I = {
+  download: '<path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  arrow: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  file: '<path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/>',
+  folder: '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/>',
+  chevR: '<path d="m9 6 6 6-6 6"/>',
+  chevD: '<path d="m6 9 6 6 6-6"/>',
+  files: '<path d="M15 2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M15 2v5h5"/><path d="M4 7v13a2 2 0 0 0 2 2h10"/>',
+  outline: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
+  collapse: '<path d="m7 20 5-5 5 5M7 4l5 5 5-5"/>',
+  newfile: '<path d="M14 2H6v20h12V6z"/><path d="M12 11v6M9 14h6"/>',
+  openfolder: '<path d="M3 7.5V18a2 2 0 0 0 2 2h14l2-8H7l-2 8"/><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2h6.5A1.5 1.5 0 0 1 19 9.5V12"/>',
+  sidebar: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  focus: '<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><circle cx="12" cy="12" r="2.5"/>',
+  sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  layers: '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  hdd: '<path d="M4 6h16v12H4z"/><path d="M8 14h.01M12 14h4"/>',
+  shield: '<path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="m9 12 2 2 4-4"/>',
+  diagram: '<rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3.5a2 2 0 0 0 2 2H14"/>',
+  sigma: '<path d="M18 7V4H6l6 8-6 8h12v-3"/>',
+  code: '<path d="m8 6-6 6 6 6M16 6l6 6-6 6"/>',
+  table: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
+  command: '<path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/>',
+  tree: '<path d="M4 4h6v5H4zM14 15h6v5h-6zM14 4h6v5h-6z"/><path d="M7 9v8.5h7M10 6.5h4"/>',
+  tabs: '<path d="M3 8h18v12H3z"/><path d="M3 8V5a1 1 0 0 1 1-1h6l2 4"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  exportIcon: '<path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 14v6h14v-6"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>',
+  md: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 15V9l3 3 3-3v6M17 9v6m-2-2 2 2 2-2"/>',
+  update: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  keyboard: '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+  github: '<path fill="currentColor" stroke="none" d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.52.1.71-.23.71-.5v-1.77c-2.9.63-3.52-1.4-3.52-1.4-.47-1.2-1.16-1.52-1.16-1.52-.95-.65.07-.64.07-.64 1.05.08 1.6 1.08 1.6 1.08.93 1.6 2.45 1.14 3.05.87.1-.68.36-1.14.66-1.4-2.32-.27-4.76-1.16-4.76-5.16 0-1.14.4-2.07 1.07-2.8-.1-.27-.46-1.33.1-2.76 0 0 .88-.28 2.88 1.07a9.9 9.9 0 0 1 5.24 0c2-1.35 2.87-1.07 2.87-1.07.57 1.43.21 2.49.1 2.76.67.73 1.07 1.66 1.07 2.8 0 4.01-2.45 4.89-4.78 5.15.38.32.71.95.71 1.92v2.85c0 .28.19.61.72.5A10.5 10.5 0 0 0 12 1.5Z"/>',
+  heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>',
+};
+const svg = (name: keyof typeof I, cls = "", style = "") =>
+  `<svg${cls ? ` class="${cls}"` : ""}${style ? ` style="${style}"` : ""} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
+
+/** Rich content, one tab each. `code` is what you'd type to get the screenshot. */
+const SHOWCASE = [
+  {
+    id: "diagrams", label: "Diagrams", icon: "diagram" as const, img: "diagrams",
+    alt: "A Mermaid flowchart of a Kubernetes request path, rendered inline in a Sarala document",
+    title: "Mermaid and D2 diagrams",
+    text: "Flowcharts, sequence diagrams and architecture maps render right in the page and follow your theme. Click a diagram to edit its source.",
+    code: "```mermaid\nflowchart LR\n  user --> ingress --> service\n```",
+  },
+  {
+    id: "math", label: "Math", icon: "sigma" as const, img: "math",
+    alt: "Queueing-theory equations typeset with KaTeX in Sarala",
+    title: "LaTeX math, typeset as you write",
+    text: "Inline and display equations render with KaTeX, with optional equation numbering and references.",
+    code: "$$\nW = \\frac{1}{\\mu - \\lambda}\n$$",
+  },
+  {
+    id: "code", label: "Code", icon: "code" as const, img: "code",
+    alt: "A syntax-highlighted Java Kafka producer in Sarala's Night theme, with the document outline beside it",
+    title: "Code blocks with real highlighting",
+    text: "Fenced code is highlighted for more than 100 languages, using colours from your theme.",
+    code: "```java\nproducer.send(record);\n```",
+  },
+  {
+    id: "tables", label: "Tables & tasks", icon: "table" as const, img: "tables",
+    alt: "A settings table, a rollout checklist and a warning callout in Sarala's GitHub theme",
+    title: "Tables, task lists and callouts",
+    text: "Edit tables cell by cell, tick tasks with a click, and use GitHub-style callouts for notes and warnings.",
+    code: "| Setting | Value |\n| :-- | --: |\n- [x] Readiness probe\n> [!WARNING]",
+  },
+  {
+    id: "palette", label: "Command palette", icon: "command" as const, img: "command-palette",
+    alt: "Sarala's command palette listing themes with colour swatches",
+    title: "Every action, one shortcut away",
+    text: "Press ⌘K (Ctrl+K on Windows and Linux) to run any command, switch theme, or jump to a file or heading.",
+    code: "⌘K  → theme night",
+  },
+];
+
+const FEATURES = [
+  { icon: "tree" as const, title: "Folders, outline and search", text: "Open a folder to browse it as a file tree, jump between headings, and search every document at once." },
+  { icon: "tabs" as const, title: "Tabs", text: "Keep several documents open and switch between them without losing your place." },
+  { icon: "eye" as const, title: "Focus and typewriter modes", text: "Dim everything but the paragraph you're writing, and keep the current line centred." },
+  { icon: "image" as const, title: "Images that just work", text: "Paste or drop an image and Sarala saves it next to your document, with a relative link." },
+  { icon: "md" as const, title: "GitHub-flavoured Markdown", text: "Tables, task lists, footnotes, callouts, emoji shortcodes and YAML front matter." },
+  { icon: "exportIcon" as const, title: "Export", text: "Save as HTML or PDF, or as Word, LaTeX and EPUB through Pandoc." },
+  { icon: "keyboard" as const, title: "Keyboard first", text: "Shortcuts for every format, a slash menu for blocks, and full keyboard navigation." },
+  { icon: "layers" as const, title: "Your fonts", text: "Pick any font installed on your computer for writing and for code." },
+  { icon: "update" as const, title: "Automatic updates", text: "New versions install from inside the app, or through Homebrew, Snap and your package manager." },
+];
+
+const THEMES = [
+  { id: "paper", dot: "#f3eee3", name: "Sarala", sub: "Warm parchment, light", bg: "#f3eee3", border: "#e4dccb", fg: "#2b2620", accent: "#9a4b28", on: "#fff8f2", sw: ["#a7402d", "#8b5629", "#785e18", "#3e6d41", "#33697c", "#735496"] },
+  { id: "pro", dot: "#ff6188", name: "Pro", sub: "Warm dark", bg: "#2d2a2e", border: "#403e41", fg: "#fcfcfa", accent: "#ff6188", on: "#2d2a2e", sw: ["#ff6188", "#fc9867", "#ffd866", "#a9dc76", "#78dce8", "#ab9df2"] },
+  { id: "classic", dot: "#a6e22e", name: "Classic", sub: "The original dark", bg: "#272822", border: "#3b3a32", fg: "#fdfff1", accent: "#f92672", on: "#272822", sw: ["#f92672", "#fd971f", "#e6db74", "#a6e22e", "#66d9ef", "#ae81ff"] },
+  { id: "octagon", dot: "#9cd1bb", name: "Octagon", sub: "Cool indigo", bg: "#282a3a", border: "#3a3d4b", fg: "#eaf2f1", accent: "#ff657a", on: "#282a3a", sw: ["#ff657a", "#ff9b5e", "#ffd76d", "#bad761", "#9cd1bb", "#c39ac9"] },
+  { id: "machine", dot: "#7cd5f1", name: "Machine", sub: "Teal graphite", bg: "#273136", border: "#3a464b", fg: "#f2fffc", accent: "#ff6d7e", on: "#273136", sw: ["#ff6d7e", "#ffb270", "#ffed72", "#a2e57b", "#7cd5f1", "#baa0f8"] },
+  { id: "ristretto", dot: "#f9cc6c", name: "Ristretto", sub: "Espresso brown", bg: "#2c2525", border: "#403838", fg: "#fff1f3", accent: "#fd6883", on: "#2c2525", sw: ["#fd6883", "#f38d70", "#f9cc6c", "#adda78", "#85dacc", "#a8a9eb"] },
+  { id: "spectrum", dot: "#948ae3", name: "Spectrum", sub: "Neutral black", bg: "#222222", border: "#363636", fg: "#f7f1ff", accent: "#fc618d", on: "#222222", sw: ["#fc618d", "#fd9353", "#fce566", "#7bd88f", "#5ad4e6", "#948ae3"] },
+];
+
+/** Shown on the page and emitted as FAQPage structured data (answers as plain text). */
+const FAQ = [
+  {
+    q: "Is Sarala really free?",
+    a: [`Yes. Sarala is free and open source under the GPL-3.0 license. There is no paid tier, no account and no trial.`],
+  },
+  {
+    q: "How is Sarala different from other Markdown editors?",
+    a: [
+      `Most editors show raw Markdown on one side and a preview on the other. Sarala renders each block in place as you type, so you read and edit the same page. Click a paragraph to see its Markdown, click away to see it rendered.`,
+      `If you know Typora, the idea is similar, but Sarala is free, open source, and adds Mermaid and D2 diagrams, an AI assistant and offline voice typing.`,
+    ],
+  },
+  {
+    q: "Are my documents locked into a special format?",
+    a: [`No. Sarala reads and writes plain .md files in folders you choose. Open them in any editor, keep them in Git, or sync them with any service.`],
+  },
+  {
+    q: "Does Sarala collect data or need the internet?",
+    a: [`Sarala has no telemetry and no account. It only goes online to check for updates, to load images your documents link to, and to download the speech model if you turn on voice typing.`],
+  },
+  {
+    q: "How does the AI assistant work? Do I need an API key?",
+    a: [`No key is needed. Sarala uses the Claude Code, OpenAI Codex or GitHub Copilot command-line tool already installed and signed in on your computer. Their edits arrive as changes you accept or reject, and Sarala stores no keys.`],
+  },
+  {
+    q: "Which platforms does Sarala run on?",
+    a: [`macOS (one build for Apple Silicon and Intel), Windows 10 and 11, and Linux as an AppImage, .deb, .rpm or Snap.`],
+  },
+];
+const faqLd = {
+  "@type": "FAQPage",
+  mainEntity: FAQ.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a.join(" ") },
+  })),
+};
 ---
 
-<Layout>
-  <!-- ============ NAV ============ -->
+<Layout extraLd={[faqLd]}>
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <header class="nav">
     <div class="wrap nav-inner">
-      <a class="brand" href="#top">
-        <img class="brand-mark" src="/assets/sarala-icon.png" alt="Sarala" width="32" height="32" />
+      <a class="brand" href="/" aria-label="Sarala home">
+        <img src="/assets/icon-64.png" alt="" width="30" height="30" />
         Sarala
       </a>
-      <nav class="nav-links">
-        <a href="#screenshots">Screenshots</a>
-        <a href="#ai">AI &amp; voice</a>
-        <a href="#preview">Live preview</a>
+      <nav class="nav-links" aria-label="Main">
         <a href="#features">Features</a>
+        <a href="#ai">AI &amp; voice</a>
         <a href="#themes">Themes</a>
-        <a href="#opensource">Open source</a>
+        <a href="#faq">FAQ</a>
       </nav>
-      <span class="nav-spacer"></span>
-      <div class="nav-mini-themes" title="Switch palette">
-        <button class="dotbtn" data-set-theme="pro" style="background:#ff6188" aria-label="Pro palette"></button>
-        <button class="dotbtn" data-set-theme="octagon" style="background:#9cd1bb" aria-label="Octagon palette"></button>
-        <button class="dotbtn" data-set-theme="machine" style="background:#7cd5f1" aria-label="Machine palette"></button>
-        <button class="dotbtn" data-set-theme="ristretto" style="background:#f9cc6c" aria-label="Ristretto palette"></button>
-        <button class="dotbtn" data-set-theme="spectrum" style="background:#948ae3" aria-label="Spectrum palette"></button>
-        <button class="dotbtn" data-set-theme="classic" style="background:#a6e22e" aria-label="Classic palette"></button>
-        <button class="dotbtn" data-set-theme="paper" style="background:#f3eee3;border-color:#b6592f" aria-label="Sarala (light) palette"></button>
+      <div class="nav-end">
+        <span class="swatches nav-swatches" role="group" aria-label="Theme">
+          {THEMES.map((t) => (
+            <button type="button" class="swatch" data-set-theme={t.id} style={`background:${t.dot}`} aria-label={`${t.name} theme`} aria-pressed="false"></button>
+          ))}
+        </span>
+        <a class="nav-gh" href={GITHUB} target="_blank" rel="noopener" aria-label="Sarala on GitHub" set:html={svg("github")} />
+        <a class="btn btn-primary nav-cta" href="#download">Download</a>
       </div>
-      <a class="nav-cta" href="#download">Download</a>
     </div>
   </header>
 
-  <main id="top">
+  <main id="main">
     <!-- ============ HERO ============ -->
-    <section class="section hero">
-      <div class="hero-bg">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-bg" aria-hidden="true">
         <div class="hero-grid"></div>
         <div class="hero-glyphs" id="hero-glyphs"></div>
       </div>
-      <div class="wrap hero-inner">
-        <div class="hero-mark reveal">
-          <img src="/assets/sarala-icon.png" alt="Sarala app icon" width="128" height="128" />
+      <div class="wrap">
+        <div class="hero-mark">
+          <img src="/assets/icon-256.png" alt="" width="116" height="116" fetchpriority="high" />
         </div>
-        <a class="eyebrow reveal" href="#ai"><span class="pip"></span> <span class="eb-lead">free &amp; open source · v{VERSION} · </span><b>new: AI assistant &amp; voice typing</b></a>
-        <h1 class="hero-title reveal">Markdown that reads like a <span class="grad">finished&nbsp;document.</span></h1>
-        <p class="hero-sub reveal">
-          Sarala is a minimal writing app that renders Markdown the moment you type it — no split panes, no preview
-          window, no friction. Free forever, open source, and yours to hack on.
+        <a class="eyebrow" href="#ai"><span class="pip" aria-hidden="true"></span><span class="eb-lead">free &amp; open source · v{VERSION} ·</span> <b>new: AI assistant &amp; voice typing</b></a>
+        <h1 id="hero-title">Markdown that reads like a <span class="grad">finished&nbsp;document.</span></h1>
+        <p class="hero-sub">
+          Sarala is a free, open-source WYSIWYG Markdown editor for macOS, Windows and Linux. Write plain Markdown and
+          see the finished document on the same page, with no preview pane and no split view.
         </p>
-        <div class="hero-cta-row reveal">
-          <a class="btn btn-primary" href="#download">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg>
-            Download free
-          </a>
-          <a class="btn btn-ghost" href={GITHUB} target="_blank" rel="noopener">
-            <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.52.1.71-.23.71-.5v-1.77c-2.9.63-3.52-1.4-3.52-1.4-.47-1.2-1.16-1.52-1.16-1.52-.95-.65.07-.64.07-.64 1.05.08 1.6 1.08 1.6 1.08.93 1.6 2.45 1.14 3.05.87.1-.68.36-1.14.66-1.4-2.32-.27-4.76-1.16-4.76-5.16 0-1.14.4-2.07 1.07-2.8-.1-.27-.46-1.33.1-2.76 0 0 .88-.28 2.88 1.07a9.9 9.9 0 0 1 5.24 0c2-1.35 2.87-1.07 2.87-1.07.57 1.43.21 2.49.1 2.76.67.73 1.07 1.66 1.07 2.8 0 4.01-2.45 4.89-4.78 5.15.38.32.71.95.71 1.92v2.85c0 .28.19.61.72.5A10.5 10.5 0 0 0 12 1.5Z"></path></svg>
-            Star on GitHub
-          </a>
+        <div class="hero-cta">
+          <a class="btn btn-primary" id="hero-dl" href="#download"><Fragment set:html={svg("download", "ico")} /><span>Download free</span></a>
+          <a class="btn btn-ghost" href={GITHUB} target="_blank" rel="noopener"><Fragment set:html={svg("github", "ico")} />View on GitHub</a>
         </div>
-        <p class="hero-meta reveal">macOS · Windows · Linux &nbsp;·&nbsp; built with Tauri &nbsp;·&nbsp; no account, no telemetry</p>
+        <ul class="hero-meta">
+          <li><Fragment set:html={svg("check")} />Free and open source</li>
+          <li><Fragment set:html={svg("check")} />No account, no telemetry</li>
+          <li><Fragment set:html={svg("check")} />Plain .md files</li>
+          <li><Fragment set:html={svg("check")} />Version {VERSION}</li>
+        </ul>
 
-        <!-- editor window -->
-        <div class="editor-stage reveal">
-          <div class="window">
-            <div class="win-bar win-bar-app">
+        <!-- A live replica of the app window: the Live / Source switch and the
+             theme swatches below it work, everything else is a picture. -->
+        <figure class="demo">
+          <div class="app" id="demo-app" data-mode="live">
+            <aside class="app-side" aria-hidden="true">
               <span class="lights"><i></i><i></i><i></i></span>
-              <span class="win-tb-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg></span>
-              <span class="win-title"><span class="dot-unsaved"></span> welcome.md</span>
-              <span class="win-cmd">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
-                Search commands…
-                <span class="kbd">⌘K</span>
-              </span>
-              <span class="win-tb-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"></path></svg></span>
-              <span class="win-tabs">
-                <span class="win-tab active">Live</span>
-                <span class="win-tab">Source</span>
-              </span>
+              <div class="side-head"><span class="ic" set:html={svg("folder")} />notes<span class="sp"></span><span class="ic" set:html={svg("openfolder")} /><span class="ic" set:html={svg("newfile")} /></div>
+              <div class="side-tabs"><span class="on" set:html={svg("files") + "Files"} /><span set:html={svg("outline") + "Outline"} /><span set:html={svg("search") + "Find"} /></div>
+              <div class="side-group"><span set:html={svg("chevD")} />Recent<span class="sp"></span><span set:html={svg("trash")} /></div>
+              <div class="side-item on"><Fragment set:html={svg("file")} />Welcome to Sarala.md<small>notes</small></div>
+              <div class="side-group"><span>All files</span><span class="sp"></span><span set:html={svg("refresh")} /><span set:html={svg("collapse")} /></div>
+              <div class="side-filter"><Fragment set:html={svg("search")} />Filter files…</div>
+              <div class="side-item"><Fragment set:html={svg("chevR") + svg("folder")} />Kafka</div>
+              <div class="side-item"><Fragment set:html={svg("chevD") + svg("folder")} />Kubernetes</div>
+              <div class="side-item l2"><Fragment set:html={svg("file")} />Cluster Architecture.md</div>
+              <div class="side-item l2"><Fragment set:html={svg("file")} />Zero-downtime Deploys.md</div>
+              <div class="side-item"><Fragment set:html={svg("chevR") + svg("folder")} />Notes</div>
+              <div class="side-item on"><Fragment set:html={svg("file")} />Welcome to Sarala.md</div>
+            </aside>
+
+            <div class="app-main">
+              <div class="app-top">
+                <span class="ic hide-sm" aria-hidden="true" set:html={svg("sidebar")} />
+                <span class="app-tab" aria-hidden="true">Welcome to Sarala.md<Fragment set:html={svg("close")} /></span>
+                <span class="ic hide-sm" aria-hidden="true" set:html={svg("plus")} />
+                <span class="sp"></span>
+                <span class="app-search" aria-hidden="true"><Fragment set:html={svg("search")} />Search commands…<kbd>⌘K</kbd></span>
+                <span class="ic hide-sm" aria-hidden="true" set:html={svg("mic")} />
+                <span class="ic hide-sm" aria-hidden="true" set:html={svg("focus")} />
+                <span class="seg" role="group" aria-label="Editor view">
+                  <button type="button" data-demo-mode="live" aria-pressed="true">Live</button>
+                  <button type="button" data-demo-mode="source" aria-pressed="false">Source</button>
+                </span>
+              </div>
+
+              <div class="app-doc">
+                <div class="rendered">
+                  <h3 class="d1">Welcome to Sarala</h3>
+                  <p>Sarala renders Markdown <b>as you type</b>. There is no preview pane: the page you write <em>is</em> the page you read. Click any paragraph to see its source.</p>
+                  <div class="callout"><b>Tip</b>Press <kbd>⌘</kbd> <kbd>K</kbd> for the command palette, or type <code>/</code> on an empty line to insert a table, a diagram or an equation.</div>
+                  <h4 class="d2">Everything in one plain-text file</h4>
+                  <table>
+                    <thead><tr><th>Feature</th><th>You type</th><th>You see</th></tr></thead>
+                    <tbody>
+                      <tr><td>Emphasis</td><td><code>**bold**</code>, <code>==highlight==</code></td><td><b>bold</b>, <mark>highlight</mark></td></tr>
+                      <tr><td>Math</td><td><code>$E = mc^2$</code></td><td><span class="math">E = mc²</span></td></tr>
+                      <tr><td>Tasks</td><td><code>- [ ] ship it</code></td><td>Clickable checkboxes</td></tr>
+                    </tbody>
+                  </table>
+                  <h4 class="d2">This week</h4>
+                  <ul>
+                    <li><span class="cb on" set:html={svg("check")} />Draft the Kafka migration plan</li>
+                    <li><span class="cb on" set:html={svg("check")} />Review the Kubernetes rollout runbook</li>
+                    <li><span class="cb"></span>Load-test the new consumer group 🚀</li>
+                  </ul>
+                </div>
+<pre class="source"><span class="mk"># </span>Welcome to Sarala
+
+Sarala renders Markdown <span class="mk">**</span>as you type<span class="mk">**</span>. There is no preview pane: the page you write <span class="mk">*</span>is<span class="mk">*</span> the page you read. Click any paragraph to see its source.
+
+<span class="mk">&gt; [!TIP]</span>
+<span class="mk">&gt;</span> Press <span class="cd">&lt;kbd&gt;⌘&lt;/kbd&gt;</span> <span class="cd">&lt;kbd&gt;K&lt;/kbd&gt;</span> for the command palette, or type <span class="cd">`/`</span> on an empty line to insert a table, a diagram or an equation.
+
+<span class="mk">## </span>Everything in one plain-text file
+
+<span class="dim">|</span> Feature <span class="dim">|</span> You type <span class="dim">|</span> You see <span class="dim">|</span>
+<span class="dim">| :-- | :-- | :-- |</span>
+<span class="dim">|</span> Emphasis <span class="dim">|</span> <span class="cd">`**bold**`</span>, <span class="cd">`==highlight==`</span> <span class="dim">|</span> <span class="mk">**</span>bold<span class="mk">**</span>, <span class="mk">==</span>highlight<span class="mk">==</span> <span class="dim">|</span>
+<span class="dim">|</span> Math <span class="dim">|</span> <span class="cd">`$E = mc^2$`</span> <span class="dim">|</span> <span class="mk">$</span>E = mc^2<span class="mk">$</span> <span class="dim">|</span>
+<span class="dim">|</span> Tasks <span class="dim">|</span> <span class="cd">`- [ ] ship it`</span> <span class="dim">|</span> Clickable checkboxes <span class="dim">|</span>
+
+<span class="mk">## </span>This week
+
+<span class="mk">- [x]</span> Draft the Kafka migration plan
+<span class="mk">- [x]</span> Review the Kubernetes rollout runbook
+<span class="mk">- [ ]</span> Load-test the new consumer group <span class="cd">:rocket:</span></pre>
+              </div>
+
+              <div class="app-status" aria-hidden="true">
+                <span><b>204</b> words</span>
+                <span class="hide-sm"><b>1711</b> characters</span>
+                <span class="hide-sm"><b>2</b> min read</span>
+                <span class="sp"></span>
+                <span class="saved">Saved</span>
+                <span class="hide-sm">Markdown · UTF-8</span>
+                <span class="hide-sm">Sarala</span>
+              </div>
             </div>
-            <div class="win-body with-status">
-              <aside class="sidebar">
-                <div class="sb-workspace">
-                  <span class="sb-app">S</span>
-                  <span class="sb-ws-name">Sarala</span>
-                  <span class="sb-add" aria-hidden="true">+</span>
-                </div>
-                <div class="sb-tabs">
-                  <span class="sb-tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"></path></svg> Files</span>
-                  <span class="sb-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h14M5 12h14M5 17h8"></path></svg> Outline</span>
-                  <span class="sb-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg> Search</span>
-                </div>
-                <div class="sb-group-label sb-recent-label">Recent <span class="sb-clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M9 6V4h6v2M6 6l1 14h10l1-14"></path></svg> Clear</span></div>
-                <div class="sb-item active"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"></path><path d="M15 2v5h5"></path></svg> welcome.md</div>
-                <div class="sb-item"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"></path><path d="M15 2v5h5"></path></svg> quick-notes.md</div>
-                <div class="sb-item"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"></path><path d="M15 2v5h5"></path></svg> draft-essay.md</div>
-                <div class="sb-item"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"></path></svg> README.md</div>
-                <div class="sb-item"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"></path></svg> changelog.md</div>
-                <div class="sb-group-label" style="margin-top:16px">All files</div>
-                <div class="sb-empty">No folder open.</div>
-                <div class="sb-empty sb-open">Open folder…</div>
-              </aside>
-              <div class="editor doc" id="hero-editor">
-                <h1>Welcome to Sarala</h1>
-                <p>A seamless <strong>WYSIWYG Markdown</strong> editor built with <em>Tauri</em> and <em>SolidJS</em> — no preview pane, no split view. Click any block to edit its Markdown source; click away and it renders in place.</p>
-                <h2>Why no preview window?</h2>
-                <blockquote>A Markdown document should be publishable as-is, as plain text, without looking like it's been marked up with tags or formatting instructions.</blockquote>
-                <p>Split panes duplicate content, waste half the screen, and pull your eyes away from the writing. Here, the editing surface <em>is</em> the preview.</p>
-                <h2>What works</h2>
-                <ul>
-                  <li><strong>Live blocks</strong> — click to reveal source, blur to render</li>
-                  <li>Keyboard: <code>Cmd/Ctrl+B</code> bold, <code>I</code> italic, <code>K</code> link, <code>1–6</code> headings</li>
-                  <li>Task lists with clickable checkboxes</li>
-                </ul>
-                <ul>
-                  <li class="task"><span class="cbx"></span>try checking this</li>
-                  <li class="task done"><span class="cbx"></span>this one is done<span class="caret"></span></li>
-                </ul>
-              </div>
-              <div class="editor-status">
-                <span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"></path></svg> <b>196</b> words</span>
-                <span class="st hide-sm"><b>1,184</b> chars</span>
-                <span class="st hide-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg> 1 min read</span>
-                <span class="st hide-sm">Ln 1, Col 1</span>
-                <span class="st-sep"></span>
-                <span class="st saved"><i></i> Saved</span>
-                <span class="st hide-sm">Markdown · UTF-8</span>
-                <span class="st theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6 2 11c0 5 4 8 8 8 1.5 0 2-1 2-2 0-.5-.3-1-.3-1.5 0-.7.6-1.2 1.3-1.2H15c3.3 0 6-2.7 6-6 0-4.4-4-8.5-9-8.5Z"></path></svg> Sarala</span>
-                <span class="st hide-sm">Default</span>
-              </div>
+
+            <div class="app-rail" aria-hidden="true">
+              <span class="ic spark" set:html={svg("sparkle")} />
+              <span class="ic" set:html={svg("gear")} />
             </div>
           </div>
-          <div class="palette-fly">
-            <span class="pf-label mono">palette</span>
-            <button class="dotbtn" data-set-theme="paper" style="background:#f3eee3;border:1.5px solid #b6592f" aria-label="Sarala (light) palette"></button>
-            <button class="dotbtn" data-set-theme="pro" style="background:#ff6188" aria-label="Pro palette"></button>
-            <button class="dotbtn" data-set-theme="octagon" style="background:#9cd1bb" aria-label="Octagon palette"></button>
-            <button class="dotbtn" data-set-theme="machine" style="background:#7cd5f1" aria-label="Machine palette"></button>
-            <button class="dotbtn" data-set-theme="ristretto" style="background:#f9cc6c" aria-label="Ristretto palette"></button>
-            <button class="dotbtn" data-set-theme="spectrum" style="background:#948ae3" aria-label="Spectrum palette"></button>
-            <button class="dotbtn active" data-set-theme="classic" style="background:#a6e22e" aria-label="Classic palette"></button>
-          </div>
-        </div>
+          <figcaption class="demo-foot">
+            <span>Switch between <b>Live</b> and <b>Source</b> above, or try a theme:</span>
+            <span class="swatches" role="group" aria-label="Theme">
+              {THEMES.map((t) => (
+                <button type="button" class="swatch" data-set-theme={t.id} style={`background:${t.dot}`} aria-label={`${t.name} theme`} aria-pressed="false"></button>
+              ))}
+            </span>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
-    <!-- ============ BUILT WITH ============ -->
-    <section class="logos">
-      <div class="wrap reveal">
-        <p class="logos-label">Built with a fast, modern, native stack</p>
-        <div class="logos-row">
-          <span><i class="gm" style="background:#ff6188"></i>Tauri</span>
-          <span><i class="gm" style="background:#fc9867"></i>SolidJS</span>
-          <span><i class="gm" style="background:#ffd866"></i>Rust</span>
-          <span><i class="gm" style="background:#a9dc76"></i>KaTeX</span>
-          <span><i class="gm" style="background:#78dce8"></i>Shiki</span>
-          <span><i class="gm" style="background:#ab9df2"></i>Mermaid</span>
-          <span><i class="gm" style="background:#ff6188"></i>D2</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ SCREENSHOTS CAROUSEL ============ -->
-    <section class="section shots" id="screenshots">
+    <!-- ============ WHY ============ -->
+    <section class="section alt" aria-labelledby="why-title">
       <div class="wrap">
         <div class="sec-head center reveal">
-          <span class="kicker" style="justify-content:center">Screenshots</span>
-          <h2>See Sarala in action.</h2>
-          <p>Real captures from Sarala 1.3: the live editor, the AI assistant, voice typing, diagrams, math and more. Click any shot to open it full-size.</p>
+          <span class="kicker">Why Sarala</span>
+          <h2 id="why-title">Write in Markdown. Read a finished document.</h2>
+        </div>
+        <div class="pillars reveal" data-stagger>
+          <div class="pillar">
+            <span class="pi" set:html={svg("eye")} />
+            <h3>One page, not two</h3>
+            <p>Formatting appears the moment you type it. Click any block to edit its Markdown, click away to see it rendered.</p>
+          </div>
+          <div class="pillar">
+            <span class="pi" set:html={svg("hdd")} />
+            <h3>Your files, on your disk</h3>
+            <p>Documents are plain .md files in folders you choose. No database, no proprietary format, no lock-in.</p>
+          </div>
+          <div class="pillar">
+            <span class="pi" set:html={svg("shield")} />
+            <h3>Private by default</h3>
+            <p>No account and no telemetry. Voice typing runs offline, and the AI assistant only edits with your approval.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHOWCASE ============ -->
+    <section class="section" id="features" aria-labelledby="showcase-title">
+      <div class="wrap">
+        <div class="sec-head center reveal">
+          <span class="kicker">Rich content</span>
+          <h2 id="showcase-title">Diagrams, math, code and tables, right in the page</h2>
+          <p>Type the Markdown you already know. Sarala renders it inline, so a technical document looks finished while you write it.</p>
         </div>
 
-        <div class="shots-carousel reveal">
-          <button class="shots-nav prev" aria-label="Previous screenshot">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
-          </button>
-          <div class="shots-track" id="shots-track">
-            {SHOTS.map((shot) => (
-              <figure class="shot">
-                <img src={`/screenshots/shots/${shot.file}.webp`} alt={shot.alt} loading="lazy" width="1680" height="1125" />
-                <span class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg></span>
-                <figcaption>{shot.cap}</figcaption>
-              </figure>
+        <div class="reveal">
+          <div class="tabs" role="tablist" aria-label="Rich content examples">
+            {SHOWCASE.map((s, i) => (
+              <button type="button" class="tab" role="tab" id={`tab-${s.id}`} aria-controls={`panel-${s.id}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+                <Fragment set:html={svg(s.icon)} />{s.label}
+              </button>
             ))}
           </div>
-          <button class="shots-nav next" aria-label="Next screenshot">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
-          </button>
+          {SHOWCASE.map((s, i) => (
+            <div class="panel" role="tabpanel" id={`panel-${s.id}`} aria-labelledby={`tab-${s.id}`} hidden={i !== 0}>
+              <figure class="shot">
+                <button type="button" data-zoom aria-label={`Enlarge screenshot: ${s.title}`}>
+                  <img src={`/screenshots/shots/${s.img}.webp`} alt={s.alt} width="1680" height="1125" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+                </button>
+              </figure>
+              <div>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+                <p class="you-type">You type<code>{s.code}</code></p>
+              </div>
+            </div>
+          ))}
         </div>
-        <div class="shots-dots" id="shots-dots"></div>
       </div>
     </section>
 
     <!-- ============ AI ASSISTANT ============ -->
-    <section class="section" id="ai">
-      <div class="wrap">
-        <div class="split">
-          <div class="split-text">
-            <div class="sec-head reveal">
-              <span class="kicker">New in 1.3 · AI assistant</span>
-              <h2>AI that edits with your permission.</h2>
-              <p>
-                Ask Claude Code, OpenAI Codex or GitHub Copilot to review, summarise or rewrite your document. Their
-                changes arrive as diffs, block by block. Nothing touches your file until you accept it, and undo works
-                as usual.
-              </p>
-            </div>
-            <div class="feat-list">
-              <div class="feat-item reveal"><span class="fnum">01</span><div><h4>Every edit is a proposal</h4><p>Word-level diffs with Accept and Reject on each change, or accept them all at once.</p></div></div>
-              <div class="feat-item reveal"><span class="fnum">02</span><div><h4>No keys, no account</h4><p>Sarala runs the agent already installed on your computer, with its own sign-in. It stores no API keys.</p></div></div>
-              <div class="feat-item reveal"><span class="fnum">03</span><div><h4>Works on a private copy</h4><p>The agent edits a scratch copy of the document with file tools only, never your real file.</p></div></div>
-            </div>
+    <section class="section alt" id="ai" aria-labelledby="ai-title">
+      <div class="wrap split">
+        <div class="split-text reveal">
+          <div class="sec-head">
+            <span class="kicker">AI assistant</span>
+            <h2 id="ai-title">AI that edits only with your approval</h2>
+            <p>Ask an AI agent to review, summarise or rewrite your document. Every change arrives as a diff you accept or reject, and undo works as usual.</p>
           </div>
-          <figure class="spot-shot reveal" data-zoom>
-            <img src="/screenshots/shots/ai-assistant.webp" alt="Claude Code proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject" loading="lazy" width="1680" height="1125" />
-            <figcaption>Claude Code proposes; you accept or reject each change.</figcaption>
-          </figure>
+          <ul class="checks">
+            <li><span class="ck" set:html={svg("check")} /><div><h3>Every edit is a proposal</h3><p>Word-level diffs with Accept and Reject on each change, or accept them all at once.</p></div></li>
+            <li><span class="ck" set:html={svg("check")} /><div><h3>No API keys, no account</h3><p>Sarala runs the agent already installed on your computer, with its own sign-in.</p></div></li>
+            <li><span class="ck" set:html={svg("check")} /><div><h3>Your file stays untouched</h3><p>The agent works on a scratch copy. Nothing changes until you accept it.</p></div></li>
+          </ul>
+          <div class="badge-row" aria-label="Supported agents"><span class="badge">Claude Code</span><span class="badge">OpenAI Codex</span><span class="badge">GitHub Copilot CLI</span></div>
         </div>
+        <figure class="shot reveal">
+          <button type="button" data-zoom aria-label="Enlarge screenshot: the AI assistant proposing edits">
+            <img src="/screenshots/shots/ai-assistant.webp" alt="The AI assistant proposing two edits to a Kubernetes runbook in Sarala, shown as diffs with Accept and Reject buttons" width="1680" height="1125" loading="lazy" decoding="async" />
+          </button>
+          <figcaption>Proposed changes appear as diffs, block by block.</figcaption>
+        </figure>
       </div>
     </section>
 
-    <!-- ============ VOICE TYPING ============ -->
-    <section class="section" id="voice" style="background:var(--bg-deep)">
-      <div class="wrap">
-        <div class="split rev">
-          <div class="split-text">
-            <div class="sec-head reveal">
-              <span class="kicker">New in 1.3 · Voice typing</span>
-              <h2>Speak, and Sarala types. Fully offline.</h2>
-              <p>
-                Hold a shortcut and talk. Speech is turned into text on your computer by an open model you download
-                once: nothing is uploaded, and there is no account or key. Built with people who can't easily type in
-                mind.
-              </p>
-            </div>
-            <div class="feat-list">
-              <div class="feat-item reveal"><span class="fnum">01</span><div><h4>Push to talk, or tap to toggle</h4><p>Hold the shortcut while you speak, tap to start and stop, or both. A small pill shows the level and timer.</p></div></div>
-              <div class="feat-item reveal"><span class="fnum">02</span><div><h4>Commands, hands-free</h4><p>Say “new paragraph”, “scratch that” or “bold that”. Pause to type as you go, without touching the keyboard.</p></div></div>
-              <div class="feat-item reveal"><span class="fnum">03</span><div><h4>Set up in a minute</h4><p>Pick your language, check your microphone with a live level meter, choose a shortcut, try it.</p></div></div>
-            </div>
+    <!-- ============ VOICE ============ -->
+    <section class="section" id="voice" aria-labelledby="voice-title">
+      <div class="wrap split rev">
+        <div class="split-text reveal">
+          <div class="sec-head">
+            <span class="kicker">Voice typing</span>
+            <h2 id="voice-title">Speak, and Sarala types. Fully offline.</h2>
+            <p>Hold a shortcut and talk. Speech becomes text on your own computer using an open model you download once, so nothing is uploaded.</p>
           </div>
-          <figure class="spot-shot reveal" data-zoom>
-            <img src="/screenshots/shots/voice-setup.webp" alt="Sarala's voice typing set-up: language, microphone check with a live level meter, shortcut, try it" loading="lazy" width="1680" height="1125" />
-            <figcaption>The four-step set-up, with a live microphone check.</figcaption>
-          </figure>
+          <ul class="checks">
+            <li><span class="ck" set:html={svg("check")} /><div><h3>Push to talk or tap to toggle</h3><p>A small pill shows the level and timer while you speak.</p></div></li>
+            <li><span class="ck" set:html={svg("check")} /><div><h3>Hands-free commands</h3><p>Say “new paragraph”, “scratch that” or “bold that” to edit without the keyboard.</p></div></li>
+            <li><span class="ck" set:html={svg("check")} /><div><h3>Ready in a minute</h3><p>Pick a language, check your microphone, choose a shortcut, and try it.</p></div></li>
+          </ul>
         </div>
-      </div>
-    </section>
-
-    <!-- ============ LIVE PREVIEW ============ -->
-    <section class="section" id="preview">
-      <div class="wrap">
-        <div class="split">
-          <div class="split-text">
-            <div class="sec-head reveal">
-              <span class="kicker">WYSIWYM</span>
-              <h2>You write the markup. We render it instantly.</h2>
-              <p>
-                Most editors split your screen in two: raw text on the left, a preview on the right, and a scrollbar
-                fighting between them. Sarala collapses both into one surface. Type
-                <code class="doc tc">**bold**</code> and it turns bold under your cursor — the syntax stays close, but never
-                in your way.
-              </p>
-            </div>
-            <div class="feat-list">
-              <div class="feat-item reveal"><span class="fnum">01</span><div><h4>No split, no lag</h4><p>The document you edit is the document you'll publish. Rendering happens on the same line you're typing.</p></div></div>
-              <div class="feat-item reveal"><span class="fnum">02</span><div><h4>Markers when you need them</h4><p>Move your cursor into a heading or link and its Markdown reappears — color-coded, ready to edit.</p></div></div>
-              <div class="feat-item reveal"><span class="fnum">03</span><div><h4>Smart list &amp; block continuation</h4><p>Sarala auto-numbers lists, carries over unchecked tasks, continues blockquotes, and handles code fences for you.</p></div></div>
-            </div>
-          </div>
-          <div class="compare reveal" data-compare>
-            <div class="compare-head mono">
-              <span class="lights"><i></i><i></i><i></i></span>
-              <span class="cmp-file"><span class="dot-unsaved" style="background:var(--green)"></span> essay.md</span>
-              <span class="flip-toggle">
-                <button class="on" data-mode="rendered">Live</button>
-                <button data-mode="src">Source</button>
-              </span>
-            </div>
-            <div class="compare-body">
-              <div class="rendered-view doc">
-                <h1>The quiet tools</h1>
-                <p>Good software is <strong>invisible</strong>. It lets you forget it's there and <em>just write</em>.</p>
-                <blockquote>A tool should feel like a pencil, not a cockpit.</blockquote>
-                <ul>
-                  <li><span class="bullet">–</span>Zero chrome</li>
-                  <li><span class="bullet">–</span>Pure keyboard flow</li>
-                  <li class="task done"><span class="cbx"></span>Reads like print</li>
-                </ul>
-                <p>Learn more at <a class="link">sarala.md</a>.</p>
-              </div>
-              <div class="src-view" style="display:none"><span class="tok-kw"># </span>The quiet tools
-
-Good software is <span class="tok-op">**</span><span class="tok-str">invisible</span><span class="tok-op">**</span>. It lets you forget
-it's there and <span class="tok-op">_</span><span class="tok-str">just write</span><span class="tok-op">_</span>.
-
-<span class="tok-com">> A tool should feel like a pencil, not a cockpit.</span>
-
-<span class="tok-kw">- </span>Zero chrome
-<span class="tok-kw">- </span>Pure keyboard flow
-<span class="tok-kw">- [x] </span>Reads like print
-
-Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(https://sarala.md)</span>.</div>
-            </div>
-          </div>
-        </div>
+        <figure class="shot reveal">
+          <button type="button" data-zoom aria-label="Enlarge screenshot: voice typing">
+            <img src="/screenshots/shots/voice-typing.webp" alt="Voice typing in Sarala: a recording pill with a live waveform while words appear in the document" width="1680" height="1125" loading="lazy" decoding="async" />
+          </button>
+          <figcaption>Words appear as you speak, with no internet connection needed.</figcaption>
+        </figure>
       </div>
     </section>
 
     <!-- ============ FEATURE GRID ============ -->
-    <section class="section" id="features" style="background:var(--bg-deep)">
+    <section class="section alt" aria-labelledby="more-title">
       <div class="wrap">
         <div class="sec-head center reveal">
-          <span class="kicker" style="justify-content:center">One editor, everything in it</span>
-          <h2>One plain-text file. Every kind of content.</h2>
-          <p>Tables, code, math and diagrams, rendered the moment you type them — plus a command palette, live outline, focus mode and typewriter scrolling that keep a long writing session in flow.</p>
+          <span class="kicker">And more</span>
+          <h2 id="more-title">Built for long writing sessions</h2>
         </div>
-        <div class="fgrid">
-          <div class="fcard span2 reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M3 5h18v14H3z"></path><path d="M3 10h18M9 5v14"></path></svg></div>
-            <h3>Tables, without the pain</h3>
-            <p>Draw a table with pipes and dashes, or use the visual builder. Sort columns, add rows, and align cells — Sarala keeps the underlying Markdown tidy.</p>
-            <table class="tbl-mini">
-              <tr><th>Feature</th><th>Sarala</th><th>Others</th></tr>
-              <tr><td>Live render</td><td style="color:var(--green)">instant</td><td>on save</td></tr>
-              <tr><td>Math</td><td style="color:var(--green)">LaTeX</td><td>plugin</td></tr>
-            </table>
-          </div>
-
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="m8 6-6 6 6 6"></path><path d="m16 6 6 6-6 6"></path></svg></div>
-            <h3>Fenced code</h3>
-            <p>Shiki-powered syntax highlighting for 100+ languages, themed to match your palette.</p>
-            <div class="mini"><span class="tok-kw">def</span> <span class="tok-fn">hello</span>():<br />&nbsp;&nbsp;<span class="tok-kw">return</span> <span class="tok-str">"hi"</span></div>
-          </div>
-
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M5 7h14M5 12h14M5 17h8"></path></svg></div>
-            <h3>Math &amp; equations</h3>
-            <p>Inline and block LaTeX, rendered with KaTeX as you write.</p>
-            <div class="math-mini">e<sup>iπ</sup> + 1 = 0&nbsp;&nbsp;·&nbsp;&nbsp;<span class="frac"><span>a</span><span>b</span></span></div>
-          </div>
-
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M9 6h6a3 3 0 0 1 3 3v6"></path></svg></div>
-            <h3>Diagrams — Mermaid &amp; D2</h3>
-            <p>Flowcharts, sequences and animated D2 pipelines, straight from a fenced code block.</p>
-            <div class="d2-mini">
-              <span class="d2n">client</span><span class="d2a"></span>
-              <span class="d2n">gateway</span><span class="d2a"></span>
-              <span class="d2n cyl">queue</span><span class="d2a"></span>
-              <span class="d2n">worker</span>
+        <div class="fgrid reveal" data-stagger>
+          {FEATURES.map((f) => (
+            <div class="fcell">
+              <span class="fi" set:html={svg(f.icon)} />
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
             </div>
-          </div>
-
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><path d="M4 4h16v16H4z"></path><path d="m8 14 3-3 2 2 3-4"></path><circle cx="9" cy="9" r="1.4"></circle></svg></div>
-            <h3>Images, footnotes &amp; tasks</h3>
-            <p>Drag an image in and it's copied beside your file. Footnotes,<sup style="color:var(--blue)">1</sup> reference links and <span style="color:var(--green)">☑</span> task lists all render live.</p>
-            <div class="mini" style="margin-top:16px;display:flex;gap:14px;flex-wrap:wrap;color:var(--muted)">
-              <span><span class="tok-prop">![alt]</span><span class="tok-num">(cover.png)</span></span>
-              <span><span class="tok-kw">- [ ]</span> todo</span>
-              <span>text<span class="tok-num">[^1]</span></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="bento">
-          <div class="bento-cell b-wide reveal">
-            <h3>Command palette <span class="mono" style="color:var(--faint);font-weight:400;font-size:12px">⌘K</span></h3>
-            <p>Every command, file, and heading — one keystroke away. Never reach for the mouse.</p>
-            <div class="mini-ui">
-              <div class="mu-head">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--faint)" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
-                <span style="font-weight:400;color:var(--faint)">toggle focus mode</span>
-                <span class="mu-done">↩ run</span>
-              </div>
-              <div class="mu-row" style="color:var(--accent)">⌘ Toggle focus mode</div>
-              <div class="mu-row">⇧ Switch palette…</div>
-              <div class="mu-row">↦ Export as PDF</div>
-            </div>
-          </div>
-          <div class="bento-cell b-tall reveal">
-            <h3>Live outline</h3>
-            <p>Every heading becomes a jump-to anchor as you write.</p>
-            <div class="outline-demo">
-              <div class="o1">▸ Sprint 24 — notes</div>
-              <div class="o2">▸ Today</div>
-              <div class="o3">· Ship inline editor</div>
-              <div class="o3">· Theme switcher</div>
-              <div class="o3">· Command palette</div>
-              <div class="o2">▸ Blockers</div>
-              <div class="o3">· Font loading race</div>
-              <div class="o3">· Export edge cases</div>
-              <div class="o2">▸ Next week</div>
-              <div class="o3">· Review docs</div>
-              <div class="o3">· Plugin API draft</div>
-              <div class="o2">▸ Backlog</div>
-              <div class="o3">· Mobile layout</div>
-              <div class="o3">· Folder sync</div>
-            </div>
-          </div>
-          <div class="bento-cell reveal">
-            <h3>Your fonts</h3>
-            <p>Pick any installed editor &amp; code font.</p>
-            <div class="mini-ui">
-              <div class="mu-seg"><span class="on">Editor</span><span>Code</span></div>
-              <div class="mu-row serif">Newsreader</div>
-              <div class="mu-row monoface">JetBrains Mono</div>
-            </div>
-          </div>
-          <div class="bento-cell b-wide reveal">
-            <h3>Focus mode</h3>
-            <p>Dim everything but the sentence you're writing.</p>
-            <div class="focus-lines">
-              <div class="fl dim" style="width:72%"></div>
-              <div class="fl on"></div>
-              <div class="fl dim" style="width:60%"></div>
-              <div class="fl dim" style="width:80%"></div>
-            </div>
-          </div>
-          <div class="bento-cell reveal">
-            <h3>File tree</h3>
-            <p>Open a folder and Sarala becomes your whole notebook.</p>
-            <div class="mini mono" style="margin-top:14px;color:var(--muted);line-height:1.8">
-              <div style="color:var(--accent)">▾ /notes</div>
-              <div style="padding-left:14px">sprint-24.md</div>
-              <div style="padding-left:14px">essay.md</div>
-            </div>
-          </div>
-          <div class="bento-cell reveal">
-            <h3>Typewriter mode</h3>
-            <p>The line you type stays centered on screen.</p>
-            <div class="tmode">&gt; <span id="tw-line" class="typed-here"></span><span class="caret" style="background:var(--accent)"></span></div>
-          </div>
-          <div class="bento-cell reveal">
-            <h3>Always current</h3>
-            <p>Built-in updater ships new versions the moment they land.</p>
-            <div class="mini-ui">
-              <div class="mu-head"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg> Update available<span class="mu-done">{VERSION}</span></div>
-              <div class="mu-row" style="padding:10px 12px">Sarala {VERSION} <span style="color:var(--accent)">Update now</span></div>
-            </div>
-          </div>
-          <div class="bento-cell b-wide reveal">
-            <h3>Export anywhere</h3>
-            <p>One document, every format. Your words aren't locked in.</p>
-            <div class="mini" style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-              <span class="dnode" style="color:var(--red)">PDF</span>
-              <span class="dnode" style="color:var(--orange)">HTML</span>
-              <span class="dnode" style="color:var(--yellow)">.docx</span>
-              <span class="dnode" style="color:var(--green)">LaTeX</span>
-              <span class="dnode" style="color:var(--blue)">EPUB</span>
-              <span class="dnode" style="color:var(--purple)">.md</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
 
-    <!-- ============ THEMES GALLERY ============ -->
-    <section class="section" id="themes">
+    <!-- ============ THEMES ============ -->
+    <section class="section" id="themes" aria-labelledby="themes-title">
       <div class="wrap">
-        <div class="sec-head reveal">
-          <span class="kicker">Thirteen built-in themes</span>
-          <h2>Pick a palette. The whole app follows.</h2>
-          <p>Every Sarala theme is a complete, hand-tuned color system — backgrounds, text, and a six-color accent set for your syntax. Thirteen ship with the app, or build your own from any base16 scheme. Click a card below to recolor this entire page, right now.</p>
+        <div class="sec-head center reveal">
+          <span class="kicker">Themes</span>
+          <h2 id="themes-title">Pick a look. The whole app follows.</h2>
+          <p>Thirteen light and dark themes ship with Sarala, or import your own. Choose one below to recolour this page.</p>
         </div>
-        <div class="theme-gallery">
-          <div class="theme-card" data-set-theme="paper" style="background:#f3eee3;border-color:#e4dccb;color:#2b2620">
-            <span class="tc-apply" style="background:#b6592f;color:#fff8f2">apply ✦</span>
-            <div class="tc-name">Sarala <span style="font-weight:400;color:#b3a893;font-size:12px">☀ light</span></div>
-            <div class="tc-sub">the signature warm parchment</div>
-            <div class="tc-code"><span style="color:#b6592f"># </span>heading<br /><span style="color:#c47a3a">**</span>bold<span style="color:#c47a3a">**</span> · <span style="color:#7a5aa0">code</span></div>
-            <div class="tc-swatches"><i style="background:#c14a34"></i><i style="background:#c47a3a"></i><i style="background:#9c7b1f"></i><i style="background:#4f8a52"></i><i style="background:#3d7d93"></i><i style="background:#7a5aa0"></i></div>
-          </div>
-
-          <div class="theme-card" data-set-theme="pro" style="background:#2d2a2e;border-color:#403e41;color:#fcfcfa">
-            <span class="tc-apply" style="background:#ff6188;color:#2d2a2e">apply ✦</span>
-            <div class="tc-name">Pro</div>
-            <div class="tc-sub">the signature warm dark</div>
-            <div class="tc-code"><span style="color:#ff6188"># </span>heading<br /><span style="color:#fc9867">**</span>bold<span style="color:#fc9867">**</span> · <span style="color:#ab9df2">code</span></div>
-            <div class="tc-swatches"><i style="background:#ff6188"></i><i style="background:#fc9867"></i><i style="background:#ffd866"></i><i style="background:#a9dc76"></i><i style="background:#78dce8"></i><i style="background:#ab9df2"></i></div>
-          </div>
-
-          <div class="theme-card" data-set-theme="octagon" style="background:#282a3a;border-color:#3a3d4b;color:#eaf2f1">
-            <span class="tc-apply" style="background:#ff657a;color:#282a3a">apply ✦</span>
-            <div class="tc-name">Octagon</div>
-            <div class="tc-sub">cool, deep indigo</div>
-            <div class="tc-code"><span style="color:#ff657a"># </span>heading<br /><span style="color:#ff9b5e">**</span>bold<span style="color:#ff9b5e">**</span> · <span style="color:#c39ac9">code</span></div>
-            <div class="tc-swatches"><i style="background:#ff657a"></i><i style="background:#ff9b5e"></i><i style="background:#ffd76d"></i><i style="background:#bad761"></i><i style="background:#9cd1bb"></i><i style="background:#c39ac9"></i></div>
-          </div>
-
-          <div class="theme-card" data-set-theme="machine" style="background:#273136;border-color:#3a464b;color:#f2fffc">
-            <span class="tc-apply" style="background:#ff6d7e;color:#273136">apply ✦</span>
-            <div class="tc-name">Machine</div>
-            <div class="tc-sub">teal-tinted graphite</div>
-            <div class="tc-code"><span style="color:#ff6d7e"># </span>heading<br /><span style="color:#ffb270">**</span>bold<span style="color:#ffb270">**</span> · <span style="color:#baa0f8">code</span></div>
-            <div class="tc-swatches"><i style="background:#ff6d7e"></i><i style="background:#ffb270"></i><i style="background:#ffed72"></i><i style="background:#a2e57b"></i><i style="background:#7cd5f1"></i><i style="background:#baa0f8"></i></div>
-          </div>
-
-          <div class="theme-card" data-set-theme="ristretto" style="background:#2c2525;border-color:#403838;color:#fff1f3">
-            <span class="tc-apply" style="background:#fd6883;color:#2c2525">apply ✦</span>
-            <div class="tc-name">Ristretto</div>
-            <div class="tc-sub">warm espresso brown</div>
-            <div class="tc-code"><span style="color:#fd6883"># </span>heading<br /><span style="color:#f38d70">**</span>bold<span style="color:#f38d70">**</span> · <span style="color:#a8a9eb">code</span></div>
-            <div class="tc-swatches"><i style="background:#fd6883"></i><i style="background:#f38d70"></i><i style="background:#f9cc6c"></i><i style="background:#adda78"></i><i style="background:#85dacc"></i><i style="background:#a8a9eb"></i></div>
-          </div>
-
-          <div class="theme-card" data-set-theme="spectrum" style="background:#222222;border-color:#363636;color:#f7f1ff">
-            <span class="tc-apply" style="background:#fc618d;color:#222222">apply ✦</span>
-            <div class="tc-name">Spectrum</div>
-            <div class="tc-sub">neutral, true black</div>
-            <div class="tc-code"><span style="color:#fc618d"># </span>heading<br /><span style="color:#fd9353">**</span>bold<span style="color:#fd9353">**</span> · <span style="color:#948ae3">code</span></div>
-            <div class="tc-swatches"><i style="background:#fc618d"></i><i style="background:#fd9353"></i><i style="background:#fce566"></i><i style="background:#7bd88f"></i><i style="background:#5ad4e6"></i><i style="background:#948ae3"></i></div>
-          </div>
-
-          <div class="theme-card current" data-set-theme="classic" style="background:#272822;border-color:#3b3a32;color:#fdfff1">
-            <span class="tc-apply" style="background:#f92672;color:#272822">apply ✦</span>
-            <div class="tc-name">Classic</div>
-            <div class="tc-sub">the original, since '06</div>
-            <div class="tc-code"><span style="color:#f92672"># </span>heading<br /><span style="color:#fd971f">**</span>bold<span style="color:#fd971f">**</span> · <span style="color:#ae81ff">code</span></div>
-            <div class="tc-swatches"><i style="background:#f92672"></i><i style="background:#fd971f"></i><i style="background:#e6db74"></i><i style="background:#a6e22e"></i><i style="background:#66d9ef"></i><i style="background:#ae81ff"></i></div>
-          </div>
-
+        <div class="theme-gallery reveal" data-stagger>
+          {THEMES.map((t) => (
+            <button type="button" class="theme-card" data-set-theme={t.id} aria-pressed="false" style={`background:${t.bg};border-color:${t.border};color:${t.fg}`}>
+              <span class="tc-on" style={`background:${t.accent};color:${t.on}`}>Active</span>
+              <span class="tc-name">{t.name}</span>
+              <span class="tc-sub" style="display:block">{t.sub}</span>
+              <span class="tc-code" style="display:block"><span style={`color:${t.sw[0]}`}>#</span> Heading<br /><span style={`color:${t.sw[1]}`}>**</span>bold<span style={`color:${t.sw[1]}`}>**</span> · <span style={`color:${t.sw[5]}`}>`code`</span></span>
+              <span class="tc-swatches">{t.sw.map((c) => <i style={`background:${c}`}></i>)}</span>
+            </button>
+          ))}
         </div>
       </div>
     </section>
 
     <!-- ============ OPEN SOURCE ============ -->
-    <section class="section" id="opensource">
-      <div class="wrap">
-        <div class="sec-head center reveal">
-          <span class="kicker" style="justify-content:center">Free &amp; open source</span>
-          <h2>Free forever. Owned by everyone.</h2>
-          <p>Sarala is released under the GNU General Public License v3.0. No price, no license keys, no telemetry — read the source, build it yourself, fork it, and ship your changes back.</p>
-        </div>
-
-        <div class="window oss-card reveal">
-          <div class="win-bar">
-            <span class="lights"><i></i><i></i><i></i></span>
-            <span class="win-title mono">sarala — git:(main)</span>
-            <span class="win-tabs"><span class="win-tab active">LICENSE</span><span class="win-tab">README.md</span></span>
-          </div>
-          <div class="oss-body">
-            <div class="oss-left">
-              <span class="license-badge"><span class="lb-k">license</span><span class="lb-v">GPL-3.0</span></span>
-              <h3>$0. Always. <br />Yours to read and change.</h3>
-              <p>Clone it, read every line, and build it yourself — or fork it into something entirely your own. No paywalled features, no license keys, no telemetry, ever.</p>
-              <div class="oss-actions">
-                <a class="btn btn-primary gh-btn" href={GITHUB} target="_blank" rel="noopener">
-                  <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.52.1.71-.23.71-.5v-1.77c-2.9.63-3.52-1.4-3.52-1.4-.47-1.2-1.16-1.52-1.16-1.52-.95-.65.07-.64.07-.64 1.05.08 1.6 1.08 1.6 1.08.93 1.6 2.45 1.14 3.05.87.1-.68.36-1.14.66-1.4-2.32-.27-4.76-1.16-4.76-5.16 0-1.14.4-2.07 1.07-2.8-.1-.27-.46-1.33.1-2.76 0 0 .88-.28 2.88 1.07a9.9 9.9 0 0 1 5.24 0c2-1.35 2.87-1.07 2.87-1.07.57 1.43.21 2.49.1 2.76.67.73 1.07 1.66 1.07 2.8 0 4.01-2.45 4.89-4.78 5.15.38.32.71.95.71 1.92v2.85c0 .28.19.61.72.5A10.5 10.5 0 0 0 12 1.5Z"></path></svg>
-                  Star on GitHub
-                </a>
-                <a class="btn btn-ghost" href={LICENSE} target="_blank" rel="noopener">
-                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"></path><path d="M15 2v5h5"></path><path d="M9 13h6M9 17h4"></path></svg>
-                  Read the license
-                </a>
-              </div>
-              <p class="oss-note">
-                <a href={CONTRIBUTING} target="_blank" rel="noopener">Contributing guide</a>
-                <span>·</span>
-                <a href={ISSUES} target="_blank" rel="noopener">Report an issue</a>
-                <span class="term-dim">— looking for a build? <a href="#download">Download →</a></span>
-              </p>
-            </div>
-            <div class="oss-right">
-              <svg class="gitgraph" viewBox="0 0 220 120" fill="none" aria-hidden="true">
-                <path id="branchline" d="M20 60 H70 C90 60 90 30 110 30 H150" stroke="var(--purple)" stroke-width="2" opacity=".5"></path>
-                <path d="M70 60 H200" stroke="var(--blue)" stroke-width="2" opacity=".5"></path>
-                <circle class="commit c1" cx="20" cy="60" r="6" fill="var(--green)"></circle>
-                <circle class="commit c2" cx="70" cy="60" r="6" fill="var(--blue)"></circle>
-                <circle class="commit c3" cx="110" cy="30" r="6" fill="var(--purple)"></circle>
-                <circle class="commit c4" cx="150" cy="30" r="6" fill="var(--purple)"></circle>
-                <circle class="commit c5" cx="140" cy="60" r="6" fill="var(--blue)"></circle>
-                <circle class="commit c5" cx="200" cy="60" r="6" fill="var(--red)"></circle>
-                <circle class="travel" r="3" fill="var(--yellow)" style="offset-path:path('M20 60 H200');"></circle>
-              </svg>
-              <div class="terminal">
-                <div class="ln"><span class="term-prompt">$</span>git clone <span class="term-path">github.com/solancer/sarala</span></div>
-                <div class="ln"><span class="term-prompt">$</span>cd sarala &amp;&amp; pnpm <span class="term-dim">install</span></div>
-                <div class="ln"><span class="term-prompt">$</span>pnpm <span class="term-dim">tauri build</span></div>
-                <div class="ln"><span class="term-ok">✓</span> <span class="term-dim">bundled</span> Sarala.app<span class="caret" style="background:var(--accent)"></span></div>
-              </div>
-            </div>
+    <section class="section alt" id="opensource" aria-labelledby="oss-title">
+      <div class="wrap oss">
+        <div class="sec-head reveal">
+          <span class="kicker">Open source</span>
+          <h2 id="oss-title">Free forever, and yours to change</h2>
+          <p>Sarala is released under the GNU GPL-3.0. Read every line, build it yourself, or fork it. Issues and pull requests are welcome.</p>
+          <div class="oss-actions">
+            <a class="btn btn-primary" href={GITHUB} target="_blank" rel="noopener"><Fragment set:html={svg("github", "ico")} />Star on GitHub</a>
+            <a class="btn btn-ghost" href={CONTRIBUTING} target="_blank" rel="noopener">Contributing guide</a>
           </div>
         </div>
-
-        <div class="oss-props">
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4Z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
-            <h3>No telemetry</h3>
-            <p>Sarala never phones home. Your files, your keystrokes, and your habits stay on your machine — verifiably, because you can read the code.</p>
-          </div>
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M6 3v12"></path><circle cx="6" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path><circle cx="18" cy="6" r="3"></circle></svg></div>
-            <h3>Built in the open</h3>
-            <p>Every line is on GitHub under GPL-3.0. Open an issue, send a pull request, or fork it into something entirely your own.</p>
-          </div>
-          <div class="fcard reveal">
-            <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></div>
-            <h3>Plain-text forever</h3>
-            <p>Your documents are just <span class="mono" style="color:var(--purple)">.md</span> files on disk. No proprietary format, no lock-in — open them in any editor, any decade.</p>
-          </div>
-        </div>
+        <ul class="oss-list reveal" data-stagger>
+          <li><span class="pi" set:html={svg("shield")} /><div><h3>No telemetry</h3><p>Sarala never reports what you write or how you use it. You can check the code.</p></div></li>
+          <li><span class="pi" set:html={svg("heart")} /><div><h3>No paid tier</h3><p>Every feature is in the free download. No licence keys, no subscription.</p></div></li>
+          <li><span class="pi" set:html={svg("code")} /><div><h3>Built with Tauri, Rust and SolidJS</h3><p>A native app that starts fast and stays light on memory.</p></div></li>
+        </ul>
       </div>
     </section>
 
-    <!-- ============ DOWNLOAD (CTA) ============ -->
-    <section class="section cta-band" id="download">
+    <!-- ============ DOWNLOAD ============ -->
+    <section class="section download-sec" id="download" aria-labelledby="dl-title">
       <div class="wrap">
-        <div class="window reveal">
-          <div class="win-bar">
-            <span class="lights"><i></i><i></i><i></i></span>
-            <span class="win-title">get-sarala.md</span>
-          </div>
-          <div class="cta-inner">
-            <span class="kicker" style="justify-content:center">Get started</span>
-            <h2>Download <span class="grad">Sarala</span></h2>
-            <p>The native, no-friction Markdown editor for Linux, macOS &amp; Windows. Free, open source, and yours to keep.</p>
-
+        <div class="dl-head reveal">
+          <span class="kicker">Download</span>
+          <h2 id="dl-title">Get Sarala</h2>
+          <p>Free for macOS, Windows and Linux. Version {VERSION}.</p>
+        </div>
             <div class="dl-picker" id="dl-picker" role="tablist" aria-label="Choose your operating system">
               <span class="dl-thumb" id="dl-thumb" aria-hidden="true"></span>
               <button type="button" class="dl-os" data-os="linux" data-label="Linux" data-file={BUILDS.linux.file} data-size={BUILDS.linux.size} data-href={`${DL}/${BUILDS.linux.file}`} role="tab" aria-selected="false">
@@ -668,7 +517,7 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
             </div>
 
             <div>
-              <a class="btn btn-primary dl-cta" id="dl-cta" href={`${DL}/${BUILDS.mac.file}`} data-magnetic download>
+              <a class="btn btn-primary dl-cta" id="dl-cta" href={`${DL}/${BUILDS.mac.file}`} download>
                 <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 21h14"></path></svg>
                 <span id="dl-cta-label">Download for macOS</span>
               </a>
@@ -692,179 +541,46 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
                   <span>Snap <em>store</em></span>
                 </a>
               </div>
-              <div class="dl-alt" data-os="mac">universal build, Apple&nbsp;Silicon &amp; Intel</div>
-              <div class="dl-alt" data-os="win">also: <a href={`${DL}/${ALT.msi}`}>.msi installer</a></div>
+              <div class="dl-alt" data-os="mac">One app for Apple&nbsp;Silicon and Intel Macs, macOS 10.15 or later</div>
+              <div class="dl-alt" data-os="win">Prefer an MSI? <a href={`${DL}/${ALT.msi}`}>Download the .msi installer</a></div>
 
-              <!-- ---- macOS Gatekeeper: first-launch guide (macOS only) ---- -->
-              <div class="dl-alt gk" data-os="mac" id="macos-first-launch" aria-labelledby="gk-title">
-                <div class="gk-top">
-                  <span class="gk-sigil" aria-hidden="true">
-                    <span class="gk-sigil-ring"></span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2.4"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path><circle cx="12" cy="15.2" r="1.15" fill="currentColor" stroke="none"></circle></svg>
-                  </span>
-                  <div class="gk-titles">
-                    <h3 id="gk-title">Opening Sarala the first time</h3>
-                    <p>Installing the <code>.dmg</code> by hand? macOS blocks apps that Apple hasn&rsquo;t notarized. Clearing it takes about ten seconds, and you only do it once. Homebrew handles this for you.</p>
+              <!-- macOS: two ways to install, side by side. Homebrew first, since it
+                   avoids the first-launch prompt; the .dmg card explains that prompt. -->
+              <div class="dl-alt mac-ways" data-os="mac">
+                <section class="way" id="macos-homebrew" aria-labelledby="brew-title">
+                  <div class="way-head">
+                    <h3 id="brew-title">Install with Homebrew</h3>
+                    <span class="way-tag">Recommended</span>
                   </div>
-                </div>
-
-                <div class="gk-tabs" id="gk-tabs" role="tablist" aria-label="Ways to open Sarala the first time">
-                  <span class="gk-thumb" id="gk-thumb" aria-hidden="true"></span>
-                  <button type="button" class="gk-tab on" id="gk-tab-cmd" role="tab" aria-selected="true" aria-controls="gk-panel-cmd" data-gk-tab="cmd">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 4 4-4 4"></path><path d="M12.5 16H19"></path></svg>
-                    <span class="gk-tab-name">One command</span>
-                    <span class="gk-tab-hint">fastest</span>
-                  </button>
-                  <button type="button" class="gk-tab" id="gk-tab-gui" role="tab" aria-selected="false" aria-controls="gk-panel-gui" data-gk-tab="gui" tabindex="-1">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 3 6.5 16 2-6.5L20 10.5Z"></path></svg>
-                    <span class="gk-tab-name">No Terminal</span>
-                    <span class="gk-tab-hint">clicks only</span>
-                  </button>
-                </div>
-
-                <div class="gk-stage" id="gk-stage">
-                  <!-- ---- method 1: one command ---- -->
-                  <div class="gk-panel on" id="gk-panel-cmd" role="tabpanel" aria-labelledby="gk-tab-cmd" data-gk-panel="cmd">
-                    <ol class="gk-steps">
-                      <li class="gk-step">
-                        <span class="gk-dot" aria-hidden="true">1</span>
-                        <div class="gk-step-body">
-                          <h4>Put Sarala in Applications</h4>
-                          <p>Open the downloaded <code>.dmg</code> and drag the Sarala icon onto the Applications folder.</p>
-                        </div>
-                      </li>
-                      <li class="gk-step">
-                        <span class="gk-dot" aria-hidden="true">2</span>
-                        <div class="gk-step-body">
-                          <h4>Run this line once</h4>
-                          <p>Press <kbd>⌘</kbd><kbd>Space</kbd>, type <b>Terminal</b>, then paste the command below and hit Return.</p>
-
-                          <figure class="gk-term">
-                            <figcaption class="gk-term-bar">
-                              <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
-                              <span class="gk-term-title">Terminal</span>
-                            </figcaption>
-                            <div class="gk-term-body">
-                              <span class="gk-prompt" aria-hidden="true">$</span>
-                              <code id="gk-cmd">{QUARANTINE_CMD}</code>
-                              <span class="gk-sweep" aria-hidden="true"></span>
-                            </div>
-                            <button type="button" class="gk-copy" data-copy="#gk-cmd" data-copied-label="Copied to clipboard">
-                              <span class="gk-copy-icons" aria-hidden="true">
-                                <svg class="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
-                                <svg class="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
-                              </span>
-                              <span class="gk-copy-label">Copy command</span>
-                            </button>
-                          </figure>
-
-                          <p class="gk-fine">It clears the &ldquo;downloaded from the internet&rdquo; quarantine flag on Sarala, and nothing else on your Mac.</p>
-                        </div>
-                      </li>
-                      <li class="gk-step">
-                        <span class="gk-dot" aria-hidden="true">3</span>
-                        <div class="gk-step-body">
-                          <h4>Open Sarala</h4>
-                          <p>Launch it from Applications. Every launch after this one is normal.</p>
-                        </div>
-                      </li>
-                    </ol>
+                  <p>No security prompt, and <code>brew upgrade</code> keeps Sarala up to date.</p>
+                  <div class="cmd">
+                    <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
+                    <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>
                   </div>
+                </section>
 
-                  <!-- ---- method 2: no Terminal ---- -->
-                  <div class="gk-panel" id="gk-panel-gui" role="tabpanel" aria-labelledby="gk-tab-gui" data-gk-panel="gui" hidden>
-                    <div class="gk-vers" id="gk-vers" aria-label="Your macOS version">
-                      <span class="gk-vthumb" id="gk-vthumb" aria-hidden="true"></span>
-                      <button type="button" class="gk-ver on" data-gk-ver="new" aria-pressed="true">Sequoia&nbsp;15 or newer</button>
-                      <button type="button" class="gk-ver" data-gk-ver="old" aria-pressed="false">Sonoma&nbsp;14 or older</button>
+                <section class="way" id="macos-first-launch" aria-labelledby="gk-title">
+                  <div class="way-head">
+                    <h3 id="gk-title">Opening the .dmg the first time</h3>
+                  </div>
+                  <p>Sarala isn't notarized by Apple (that needs a paid developer account), so macOS asks you to confirm once.</p>
+                  <ol class="way-steps">
+                    <li><span>Drag <b>Sarala</b> into <b>Applications</b> and open it.</span></li>
+                    <li><span>If macOS blocks it, open <b>System Settings › Privacy &amp; Security</b>.</span></li>
+                    <li><span>Scroll down and click <b>Open Anyway</b>, then confirm.</span></li>
+                  </ol>
+                  <details class="way-more">
+                    <summary>Prefer Terminal? Use one command instead</summary>
+                    <div class="cmd">
+                      <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#gk-cmd"><span class="gk-copy-label">Copy</span></button></div>
+                    <pre id="gk-cmd"><code>{QUARANTINE_CMD}</code></pre>
                     </div>
-
-                    <div class="gk-verstage" id="gk-verstage">
-                      <ol class="gk-steps" data-gk-verpanel="new">
-                        <li class="gk-step">
-                          <span class="gk-dot" aria-hidden="true">1</span>
-                          <div class="gk-step-body">
-                            <h4>Try to open it</h4>
-                            <p>Double-click <b>Sarala</b> in Applications. macOS refuses and shows a warning, so click <b>Done</b>.</p>
-                          </div>
-                        </li>
-                        <li class="gk-step">
-                          <span class="gk-dot" aria-hidden="true">2</span>
-                          <div class="gk-step-body">
-                            <h4>Open Privacy &amp; Security</h4>
-                            <p>Apple&nbsp;menu <span class="gk-arrow" aria-hidden="true">&rsaquo;</span> <b>System Settings</b> <span class="gk-arrow" aria-hidden="true">&rsaquo;</span> <b>Privacy &amp; Security</b>, then scroll down to the <b>Security</b> section.</p>
-                          </div>
-                        </li>
-                        <li class="gk-step">
-                          <span class="gk-dot" aria-hidden="true">3</span>
-                          <div class="gk-step-body">
-                            <h4>Click Open Anyway</h4>
-                            <p>It sits next to &ldquo;Sarala was blocked&hellip;&rdquo;. Confirm with Touch&nbsp;ID or your password and Sarala launches.</p>
-                          </div>
-                        </li>
-                      </ol>
-
-                      <ol class="gk-steps" data-gk-verpanel="old" hidden>
-                        <li class="gk-step">
-                          <span class="gk-dot" aria-hidden="true">1</span>
-                          <div class="gk-step-body">
-                            <h4>Right-click the app</h4>
-                            <p>In Applications, right-click (or Control-click) <b>Sarala</b>.</p>
-                          </div>
-                        </li>
-                        <li class="gk-step">
-                          <span class="gk-dot" aria-hidden="true">2</span>
-                          <div class="gk-step-body">
-                            <h4>Choose Open, twice</h4>
-                            <p>Pick <b>Open</b> from the menu, then <b>Open</b> again in the dialog that appears.</p>
-                          </div>
-                        </li>
-                      </ol>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="gk-note">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5.5"></path><path d="M12 7.6v.1"></path></svg>
-                  <p><b>Seeing &ldquo;Sarala is damaged and can&rsquo;t be opened&rdquo;?</b> Your download is fine. That is simply how Gatekeeper describes an un-notarized app on Apple&nbsp;Silicon, and either method above clears it.</p>
-                </div>
-
-                <p class="gk-copy-status" id="gk-copy-status" role="status" aria-live="polite"></p>
-
-                <p class="gk-why">
-                  Notarization needs a paid Apple Developer account. Sarala is free and open source, so you can
-                  <a href={RELEASES} target="_blank" rel="noopener">verify the release checksums</a> or
-                  <a href={GITHUB} target="_blank" rel="noopener">build it from source</a> instead of taking our word for it.
-                </p>
+                    <p class="fine">This removes the "downloaded from the internet" flag from Sarala only.</p>
+                  </details>
+                  <p class="fine">On macOS 14 or older, right-click Sarala and choose <b>Open</b> instead. A message saying Sarala "is damaged" is the same warning on Apple Silicon; these steps clear it. You can also <a href={RELEASES} target="_blank" rel="noopener">verify the checksums</a> or <a href={GITHUB} target="_blank" rel="noopener">build it yourself</a>.</p>
+                </section>
+                <p class="gk-copy-status visually-hidden" id="gk-copy-status" role="status" aria-live="polite"></p>
               </div>
-
-              <!-- ---- Homebrew: the no-download route (macOS only) ---- -->
-              <div class="dl-alt brew" data-os="mac" id="macos-homebrew" aria-labelledby="brew-title">
-                <div class="gk-top">
-                  <span class="gk-sigil brew-sigil" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5h10v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-9Z"></path><path d="M15 11h2.2a2.3 2.3 0 0 1 0 4.6H15"></path><path d="M8 6V4.2M12 6V3.6"></path></svg>
-                  </span>
-                  <div class="gk-titles">
-                    <h3 id="brew-title">Rather use Homebrew?</h3>
-                    <p>Three lines in Terminal instead of the download: no&nbsp;disk image to drag, no first-launch warning, and <code>brew upgrade</code> keeps Sarala current.</p>
-                  </div>
-                </div>
-
-                <figure class="gk-term brew-term">
-                  <figcaption class="gk-term-bar">
-                    <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
-                    <span class="gk-term-title">Terminal</span>
-                  </figcaption>
-                  <div class="gk-term-body brew-body">
-                    <ol class="brew-lines" id="brew-cmd">
-                      {BREW_CMDS.map((cmd) => <li><code class="ln">{cmd}</code></li>)}
-                    </ol>
-                  </div>
-                </figure>
-
-                <p class="gk-fine"><b>tap</b> points Homebrew at the Sarala repository, <b>trust</b> approves that source once, and <b>install</b> puts Sarala&nbsp;{VERSION} in your Applications folder. Later on, <code>brew upgrade --cask sarala</code> updates it.</p>
-              </div>
-
               <div>
                 <a class="dl-all" href={RELEASES} target="_blank" rel="noopener">
                   All releases &amp; checksums
@@ -872,69 +588,79 @@ Learn more at <span class="tok-prop">[sarala.md]</span><span class="tok-num">(ht
                 </a>
               </div>
             </div>
-          </div>
-        </div>
       </div>
     </section>
 
-  </main>
-
-  <!-- ============ FOOTER ============ -->
-  <footer class="footer">
-    <div class="wrap">
-      <hr class="rainbow-rule" style="margin-bottom:48px" />
-      <div class="footer-top">
-        <div class="footer-brand">
-          <a class="brand" href="#top">
-            <img class="brand-mark" src="/assets/sarala-icon.png" alt="Sarala" width="32" height="32" />
-            Sarala
-          </a>
-          <p>A Markdown editor that reads like a finished document. Free, open source, and built for people who'd rather write than fiddle.</p>
+    <!-- ============ FAQ ============ -->
+    <section class="section alt" id="faq" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="sec-head center reveal">
+          <span class="kicker">FAQ</span>
+          <h2 id="faq-title">Questions, answered</h2>
         </div>
-        <div class="footer-col">
-          <h5>Product</h5>
-          <a href="#screenshots">Screenshots</a>
-          <a href="#ai">AI &amp; voice</a>
-          <a href="#preview">Live preview</a>
-          <a href="#features">Features</a>
-          <a href="#themes">Themes</a>
-          <a href="#opensource">Open source</a>
-        </div>
-        <div class="footer-col">
-          <h5>Resources</h5>
-          <a href="#download">Download</a>
-          <a href={SNAP} target="_blank" rel="noopener">Snap Store</a>
-          <a href="https://www.markdownguide.org/" target="_blank" rel="noopener">Markdown guide</a>
-          <a href={`${GITHUB}#readme`} target="_blank" rel="noopener">Documentation</a>
-          <a href={`${GITHUB}/releases`} target="_blank" rel="noopener">Changelog</a>
-        </div>
-        <div class="footer-col">
-          <h5>Open source</h5>
-          <a href={GITHUB} target="_blank" rel="noopener">GitHub repo</a>
-          <a href={LICENSE} target="_blank" rel="noopener">GPL-3.0 license</a>
-          <a href={CONTRIBUTING} target="_blank" rel="noopener">Contributing</a>
-          <a href={ISSUES} target="_blank" rel="noopener">Report an issue</a>
+        <div class="faq reveal">
+          {FAQ.map((f) => (
+            <details>
+              <summary>{f.q}<Fragment set:html={svg("plus")} /></summary>
+              <div class="answer">{f.a.map((p) => <p>{p}</p>)}</div>
+            </details>
+          ))}
         </div>
       </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="/">
+            <img src="/assets/icon-64.png" alt="" width="30" height="30" />
+            Sarala
+          </a>
+          <p>A free, open-source Markdown editor that renders as you type. Sarala (सरल) means “simple”.</p>
+        </div>
+        <nav class="footer-col" aria-labelledby="f-product">
+          <h2 id="f-product">Product</h2>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#ai">AI assistant</a></li>
+            <li><a href="#voice">Voice typing</a></li>
+            <li><a href="#themes">Themes</a></li>
+            <li><a href="#download">Download</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-labelledby="f-res">
+          <h2 id="f-res">Resources</h2>
+          <ul>
+            <li><a href={`${GITHUB}#readme`} target="_blank" rel="noopener">Documentation</a></li>
+            <li><a href={RELEASES} target="_blank" rel="noopener">Release notes</a></li>
+            <li><a href={SNAP} target="_blank" rel="noopener">Snap Store</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-labelledby="f-oss">
+          <h2 id="f-oss">Open source</h2>
+          <ul>
+            <li><a href={GITHUB} target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href={LICENSE} target="_blank" rel="noopener">GPL-3.0 license</a></li>
+            <li><a href={CONTRIBUTING} target="_blank" rel="noopener">Contributing</a></li>
+            <li><a href={ISSUES} target="_blank" rel="noopener">Report an issue</a></li>
+          </ul>
+        </nav>
+      </div>
       <div class="footer-bottom">
-        <span>© 2026 Sarala · GPL-3.0 · सरल, "simple"</span>
+        <span>© 2026 Sarala · GPL-3.0</span>
         <span>macOS · Windows · Linux</span>
       </div>
     </div>
   </footer>
 
-  <!-- ============ LIGHTBOX ============ -->
-  <div class="lightbox" id="lightbox" hidden aria-modal="true" role="dialog" aria-label="Screenshot viewer">
-    <button class="lb-close" aria-label="Close">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
-    </button>
-    <button class="lb-nav lb-prev" aria-label="Previous">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
-    </button>
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Screenshot viewer">
+    <button type="button" class="lb-close" aria-label="Close" set:html={svg("close")} />
+    <button type="button" class="lb-nav lb-prev" aria-label="Previous screenshot" set:html={svg("chevR", "", "transform:scaleX(-1)")} />
     <img class="lb-img" id="lb-img" src="" alt="" />
-    <button class="lb-nav lb-next" aria-label="Next">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
-    </button>
+    <button type="button" class="lb-nav lb-next" aria-label="Next screenshot" set:html={svg("chevR")} />
     <div class="lb-cap" id="lb-cap"></div>
   </div>
 </Layout>

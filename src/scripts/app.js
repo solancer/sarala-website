@@ -1,5 +1,7 @@
 /* ============================================================
-   SARALA — interactions
+   SARALA website: interactions
+   Everything here is progressive enhancement; the page reads
+   fine without it.
    ============================================================ */
 (function () {
   "use strict";
@@ -17,182 +19,97 @@
       try { localStorage.setItem(STORE, name); } catch (e) {}
     }
     document.querySelectorAll("[data-set-theme]").forEach(function (el) {
-      el.classList.toggle("active", el.getAttribute("data-set-theme") === name);
-    });
-    document.querySelectorAll(".theme-card").forEach(function (el) {
-      el.classList.toggle("current", el.getAttribute("data-set-theme") === name);
+      el.setAttribute("aria-pressed", el.getAttribute("data-set-theme") === name ? "true" : "false");
     });
   }
 
   document.addEventListener("click", function (e) {
     var t = e.target.closest("[data-set-theme]");
-    if (t) { applyTheme(t.getAttribute("data-set-theme"), true); }
+    if (t) applyTheme(t.getAttribute("data-set-theme"), true);
   });
 
   var saved = "classic";
   try { saved = localStorage.getItem(STORE) || "classic"; } catch (e) {}
   applyTheme(saved, false);
 
-  /* ---------- NAV scrolled state ---------- */
+  /* ---------- NAV: border once the page scrolls ---------- */
   var nav = document.querySelector(".nav");
-  function onScroll() {
-    if (nav) nav.classList.toggle("scrolled", window.scrollY > 12);
-  }
+  function onScroll() { if (nav) nav.classList.toggle("scrolled", window.scrollY > 8); }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* Scroll reveal now lives in motion.js (springs + stagger). */
-
-  /* ---------- HERO TYPING DEMO ---------- */
-  // Each step: {type:"type", el, segs:[{t,c}], speed} or {type:"show", el}
-  var editor = document.getElementById("hero-editor");
-  if (editor) {
-    var blocks = Array.prototype.slice.call(editor.querySelectorAll("[data-block]"));
-    // stash target html + hide
-    blocks.forEach(function (b) {
-      b._typeSegs = b.getAttribute("data-segs");
-      b.style.opacity = "0";
-    });
-
-    var caret = document.createElement("span");
-    caret.className = "caret";
-
-    function renderSegs(segsJSON, n) {
-      var segs;
-      try { segs = JSON.parse(segsJSON); } catch (e) { return ""; }
-      var out = "", count = 0;
-      for (var i = 0; i < segs.length; i++) {
-        var s = segs[i], txt = s.t;
-        if (n !== undefined) {
-          if (count >= n) break;
-          var take = Math.min(txt.length, n - count);
-          txt = txt.slice(0, take);
-          count += take;
-        }
-        var open = s.c ? '<span class="' + s.c + '">' : "";
-        var close = s.c ? "</span>" : "";
-        out += open + escapeHtml(txt) + close;
-        if (n !== undefined && count >= n) break;
-      }
-      return out;
-    }
-    function totalLen(segsJSON) {
-      try {
-        return JSON.parse(segsJSON).reduce(function (a, s) { return a + s.t.length; }, 0);
-      } catch (e) { return 0; }
-    }
-    function escapeHtml(s) {
-      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    function typeBlock(b, done) {
-      b.style.opacity = "1";
-      var segs = b._typeSegs;
-      if (!segs) { // complex prebuilt block, just reveal
-        b.appendChild(caret);
-        setTimeout(function () { if (caret.parentNode === b) b.removeChild(caret); done(); }, 360);
-        return;
-      }
-      var total = totalLen(segs), n = 0;
-      b.innerHTML = "";
-      b.appendChild(caret);
-      var speed = 16;
-      function tick() {
-        n++;
-        b.innerHTML = renderSegs(segs, n);
-        b.appendChild(caret);
-        if (n < total) {
-          // vary speed slightly for natural feel
-          setTimeout(tick, speed + (Math.random() * 22));
-        } else {
-          setTimeout(done, 220);
-        }
-      }
-      tick();
-    }
-
-    var idx = 0;
-    function runSeq() {
-      if (idx >= blocks.length) {
-        if (caret.parentNode) caret.parentNode.removeChild(caret);
-        return;
-      }
-      var b = blocks[idx++];
-      typeBlock(b, runSeq);
-    }
-
-    var started = false;
-    function startHero() {
-      if (started) return;
-      started = true;
-      setTimeout(runSeq, 400);
-    }
-    // hero is above the fold — start shortly after load
-    setTimeout(startHero, 650);
-  }
-
-  /* ---------- COMPARE TOGGLE (source / rendered) ---------- */
-  document.querySelectorAll("[data-compare]").forEach(function (wrap) {
-    var btns = wrap.querySelectorAll(".flip-toggle button");
-    var src = wrap.querySelector(".src-view");
-    var rendered = wrap.querySelector(".rendered-view");
-    btns.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        btns.forEach(function (b) { b.classList.remove("on"); });
-        btn.classList.add("on");
-        var mode = btn.getAttribute("data-mode");
-        if (src) src.style.display = mode === "src" ? "block" : "none";
-        if (rendered) rendered.style.display = mode === "rendered" ? "block" : "none";
-      });
-    });
-  });
-
-  /* ---------- HERO FLOATING GLYPHS ---------- */
+  /* ---------- HERO: Markdown symbols drifting up the grid ---------- */
   var glyphHost = document.getElementById("hero-glyphs");
   if (glyphHost) {
     var GLYPHS = ["#", "*", "_", ">", "`", "-", "[ ]", "##", "**", "~~", "1.", "|"];
     var GCOLORS = ["var(--red)", "var(--orange)", "var(--yellow)", "var(--green)", "var(--blue)", "var(--purple)"];
-    var N = 16;
-    for (var i = 0; i < N; i++) {
-      var s = document.createElement("span");
-      s.textContent = GLYPHS[i % GLYPHS.length];
-      s.style.left = (4 + Math.random() * 92) + "%";
-      s.style.top = (Math.random() * 100) + "%";
-      s.style.fontSize = (15 + Math.random() * 30) + "px";
-      s.style.color = GCOLORS[i % GCOLORS.length];
-      s.style.setProperty("--dur", (11 + Math.random() * 9).toFixed(1) + "s");
-      s.style.setProperty("--del", (-Math.random() * 14).toFixed(1) + "s");
-      glyphHost.appendChild(s);
+    for (var g = 0; g < 16; g++) {
+      var sp = document.createElement("span");
+      sp.textContent = GLYPHS[g % GLYPHS.length];
+      sp.style.left = (4 + Math.random() * 92) + "%";
+      sp.style.top = (Math.random() * 100) + "%";
+      sp.style.fontSize = (15 + Math.random() * 30) + "px";
+      sp.style.color = GCOLORS[g % GCOLORS.length];
+      sp.style.setProperty("--dur", (11 + Math.random() * 9).toFixed(1) + "s");
+      sp.style.setProperty("--del", (-Math.random() * 14).toFixed(1) + "s");
+      glyphHost.appendChild(sp);
     }
   }
 
-  /* ---------- typewriter mini in bento ---------- */
-  var tw = document.getElementById("tw-line");
-  if (tw) {
-    var phrases = ["The cursor stays centered.", "Your eyes never move.", "Just keep writing."];
-    var pi = 0, ci = 0, deleting = false;
-    function twTick() {
-      var p = phrases[pi];
-      tw.textContent = p.slice(0, ci);
-      if (!deleting) {
-        ci++;
-        if (ci > p.length) { deleting = true; setTimeout(twTick, 1400); return; }
-        setTimeout(twTick, 55);
-      } else {
-        ci--;
-        if (ci < 0) { deleting = false; ci = 0; pi = (pi + 1) % phrases.length; setTimeout(twTick, 300); return; }
-        setTimeout(twTick, 28);
-      }
-    }
-    var twStarted = false;
-    function startTw() {
-      if (twStarted) return;
-      var r = tw.getBoundingClientRect();
-      if (r.top < (window.innerHeight || 800) * 1.1) { twStarted = true; twTick(); }
-    }
-    window.addEventListener("scroll", startTw, { passive: true });
-    setTimeout(startTw, 800);
+  /* ---------- HERO DEMO: Live / Source ---------- */
+  var demo = document.getElementById("demo-app");
+  if (demo) {
+    var modeBtns = demo.querySelectorAll("[data-demo-mode]");
+    modeBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var mode = btn.getAttribute("data-demo-mode");
+        demo.setAttribute("data-mode", mode);
+        modeBtns.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+      });
+    });
   }
+
+  /* ---------- VISITOR'S OS (hero button + download picker) ---------- */
+  var probe = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "") +
+              " " + (navigator.userAgent || "");
+  var detectedOS = null;
+  if (/Android|iPhone|iPad|iPod/i.test(probe)) detectedOS = null; // no mobile build
+  else if (/Win/i.test(probe)) detectedOS = "win";
+  else if (/Mac/i.test(probe)) detectedOS = "mac";
+  else if (/Linux|X11|CrOS/i.test(probe)) detectedOS = "linux";
+  var OS_LABEL = { mac: "macOS", win: "Windows", linux: "Linux" };
+  var heroDl = document.getElementById("hero-dl");
+  if (heroDl && detectedOS) {
+    heroDl.querySelector("span").textContent = "Download for " + OS_LABEL[detectedOS];
+  }
+
+  /* ---------- SHOWCASE TABS (WAI-ARIA tabs pattern) ---------- */
+  document.querySelectorAll('[role="tablist"].tabs').forEach(function (list) {
+    var tabs = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) tab.focus();
+    }
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(tab, false); });
+      tab.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
+        else if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
+        else if (e.key === "Home") next = tabs[0];
+        else if (e.key === "End") next = tabs[tabs.length - 1];
+        if (!next) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+  });
 
   /* ---------- DOWNLOAD OS PICKER ---------- */
   var dlPicker = document.getElementById("dl-picker");
@@ -242,13 +159,8 @@
       });
     });
 
-    // auto-detect the visitor's OS
-    var probe = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "") +
-                " " + (navigator.userAgent || "");
-    var os = "mac"; // sensible default
-    if (/Win/i.test(probe)) os = "win";
-    else if (/Mac|iPhone|iPad|iPod/i.test(probe)) os = "mac";
-    else if (/Linux|X11|Ubuntu|Debian|Fedora|CrOS/i.test(probe) && !/Android/i.test(probe)) os = "linux";
+    // Preselect the visitor's OS (macOS when it can't be told, e.g. on a phone).
+    var os = detectedOS || "mac";
     selectOS(os);
 
     // Deep link: /#macos-first-launch opens the Gatekeeper panel on any platform,
@@ -285,114 +197,57 @@
     openMacNote(false);
   }
 
-  /* Copy-to-clipboard now lives in motion.js (sweep + check animation). */
-
-  /* ---------- SCREENSHOTS CAROUSEL + LIGHTBOX ---------- */
-  var track = document.getElementById("shots-track");
-  if (track) {
-    var shots = Array.prototype.slice.call(track.querySelectorAll(".shot"));
-    var dotsWrap = document.getElementById("shots-dots");
-    var prevBtn = document.querySelector(".shots-nav.prev");
-    var nextBtn = document.querySelector(".shots-nav.next");
-
-    var dots = shots.map(function (s, i) {
-      var d = document.createElement("button");
-      d.setAttribute("aria-label", "Go to screenshot " + (i + 1));
-      d.addEventListener("click", function () { scrollToShot(i); });
-      dotsWrap.appendChild(d);
-      return d;
-    });
-
-    function currentIndex() {
-      var c = track.scrollLeft + track.clientWidth / 2;
-      var best = 0, bestDist = Infinity;
-      shots.forEach(function (s, i) {
-        var center = s.offsetLeft + s.offsetWidth / 2;
-        var dist = Math.abs(center - c);
-        if (dist < bestDist) { bestDist = dist; best = i; }
-      });
-      return best;
-    }
-    function updateDots() {
-      var idx = currentIndex();
-      dots.forEach(function (d, i) { d.classList.toggle("on", i === idx); });
-    }
-    function scrollToShot(i) {
-      i = Math.max(0, Math.min(shots.length - 1, i));
-      var s = shots[i];
-      track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.offsetWidth) / 2, behavior: "smooth" });
-    }
-    if (prevBtn) prevBtn.addEventListener("click", function () { scrollToShot(currentIndex() - 1); });
-    if (nextBtn) nextBtn.addEventListener("click", function () { scrollToShot(currentIndex() + 1); });
-    var craf;
-    track.addEventListener("scroll", function () {
-      if (craf) cancelAnimationFrame(craf);
-      craf = requestAnimationFrame(updateDots);
-    }, { passive: true });
-    updateDots();
-
-    // ----- lightbox -----
-    var lb = document.getElementById("lightbox");
+  /* ---------- LIGHTBOX for every [data-zoom] screenshot ---------- */
+  var lb = document.getElementById("lightbox");
+  var zooms = Array.prototype.slice.call(document.querySelectorAll("[data-zoom]"));
+  if (lb && zooms.length) {
     var lbImg = document.getElementById("lb-img");
     var lbCap = document.getElementById("lb-cap");
-    var lbIndex = 0;
-    var dragged = false;
+    var current = 0;
+    var opener = null;
 
-    function openLb(i) {
-      lbIndex = ((i % shots.length) + shots.length) % shots.length;
-      var s = shots[lbIndex];
-      var img = s.querySelector("img");
-      var cap = s.querySelector("figcaption");
-      lbImg.src = s.getAttribute("data-full") || img.getAttribute("src");
+    function show(i) {
+      current = (i + zooms.length) % zooms.length;
+      var img = zooms[current].querySelector("img");
+      var fig = zooms[current].closest("figure");
+      var cap = fig && fig.querySelector("figcaption");
+      lbImg.src = img.getAttribute("src");
       lbImg.alt = img.getAttribute("alt") || "";
-      lbCap.textContent = cap ? cap.textContent : "";
+      lbCap.textContent = cap ? cap.textContent : (img.getAttribute("alt") || "");
+    }
+    function open(i) {
+      opener = document.activeElement;
+      show(i);
       lb.hidden = false;
       requestAnimationFrame(function () { lb.classList.add("open"); });
       document.body.style.overflow = "hidden";
+      lb.querySelector(".lb-close").focus();
     }
-    function closeLb() {
+    function close() {
       lb.classList.remove("open");
       document.body.style.overflow = "";
-      setTimeout(function () { lb.hidden = true; lbImg.src = ""; }, 260);
+      setTimeout(function () { lb.hidden = true; lbImg.src = ""; }, 220);
+      if (opener && opener.focus) opener.focus();
     }
-    function lbGo(dir) { openLb(lbIndex + dir); scrollToShot(((lbIndex % shots.length) + shots.length) % shots.length); }
 
-    // distinguish a click from a swipe/drag on the track
-    track.addEventListener("pointerdown", function () { dragged = false; }, { passive: true });
-    track.addEventListener("pointermove", function (e) { if (e.buttons) dragged = true; }, { passive: true });
-    shots.forEach(function (s, i) {
-      s.addEventListener("click", function () { if (!dragged) openLb(i); });
+    zooms.forEach(function (z, i) { z.addEventListener("click", function () { open(i); }); });
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb || e.target.closest(".lb-close")) close();
     });
-
-    // Section screenshots (AI, voice) open in the same lightbox, on their own.
-    Array.prototype.slice.call(document.querySelectorAll("[data-zoom]")).forEach(function (fig) {
-      fig.addEventListener("click", function () {
-        var img = fig.querySelector("img");
-        var cap = fig.querySelector("figcaption");
-        lbImg.src = img.getAttribute("src");
-        lbImg.alt = img.getAttribute("alt") || "";
-        lbCap.textContent = cap ? cap.textContent : "";
-        lb.hidden = false;
-        requestAnimationFrame(function () { lb.classList.add("open"); });
-        document.body.style.overflow = "hidden";
-      });
+    lb.querySelector(".lb-prev").addEventListener("click", function (e) { e.stopPropagation(); show(current - 1); });
+    lb.querySelector(".lb-next").addEventListener("click", function (e) { e.stopPropagation(); show(current + 1); });
+    document.addEventListener("keydown", function (e) {
+      if (lb.hidden) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") show(current - 1);
+      else if (e.key === "ArrowRight") show(current + 1);
+      else if (e.key === "Tab") {
+        // keep focus inside the dialog
+        var f = Array.prototype.slice.call(lb.querySelectorAll("button"));
+        var idx = f.indexOf(document.activeElement);
+        e.preventDefault();
+        f[(idx + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+      }
     });
-
-    if (lb) {
-      lb.addEventListener("click", function (e) {
-        if (e.target === lb || e.target.closest(".lb-close")) closeLb();
-      });
-      var lbPrev = lb.querySelector(".lb-prev");
-      var lbNext = lb.querySelector(".lb-next");
-      if (lbPrev) lbPrev.addEventListener("click", function (e) { e.stopPropagation(); lbGo(-1); });
-      if (lbNext) lbNext.addEventListener("click", function (e) { e.stopPropagation(); lbGo(1); });
-      document.addEventListener("keydown", function (e) {
-        if (lb.hidden) return;
-        if (e.key === "Escape") closeLb();
-        else if (e.key === "ArrowLeft") lbGo(-1);
-        else if (e.key === "ArrowRight") lbGo(1);
-      });
-    }
   }
-
 })();

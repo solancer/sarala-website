@@ -1,49 +1,82 @@
 ---
 import "../styles/global.css";
-import { VERSION, GITHUB as REPO } from "../consts";
+import { VERSION, GITHUB, RELEASES } from "../consts";
 
 export interface Props {
   title?: string;
   description?: string;
-  /** Page-relative path, e.g. "/" — used for canonical + og:url */
+  /** Page-relative path, e.g. "/", used for canonical and og:url. */
   path?: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  /** Keep a page out of search results (404, promo reel). */
+  noindex?: boolean;
+  /** Extra schema.org nodes for this page (e.g. FAQPage), merged into one @graph. */
+  extraLd?: Record<string, unknown>[];
 }
 
 const {
-  title = "Sarala — A Markdown editor that gets out of your way",
-  description = "Sarala is a free, open-source WYSIWYG Markdown editor that renders as you type — no preview pane, no split view. Live math, diagrams, syntax highlighting, and export to PDF, HTML, and more. For macOS, Windows & Linux.",
+  title = "Sarala: Free WYSIWYG Markdown Editor for Mac, Windows and Linux",
+  description = "Free, open-source Markdown editor that renders as you type, with no preview pane. Mermaid and D2 diagrams, LaTeX math, AI assistant and offline voice typing.",
   path = "/",
-  ogImage = "/screenshots/og.png",
+  ogImage = "/screenshots/og.jpg",
+  ogImageAlt = "Sarala, a Markdown editor showing a rendered document with a table, a callout and a task list",
+  noindex = false,
+  extraLd = [],
 } = Astro.props;
 
-const siteUrl = Astro.site ?? new URL("https://sarala.solancer.com");
-const canonical = new URL(path, siteUrl).href;
-const ogImageAbs = new URL(ogImage, siteUrl).href;
+const site = Astro.site ?? new URL("https://sarala.solancer.com");
+const canonical = new URL(path, site).href;
+const ogImageAbs = new URL(ogImage, site).href;
+const shot = (name: string) => new URL(`/screenshots/shots/${name}.webp`, site).href;
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Sarala",
-  applicationCategory: "DeveloperApplication",
-  applicationSubCategory: "Markdown Editor",
-  operatingSystem: "macOS, Windows, Linux",
-  description,
-  url: siteUrl.href,
-  downloadUrl: `${REPO}/releases`,
-  license: "https://www.gnu.org/licenses/gpl-3.0.html",
-  isAccessibleForFree: true,
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  softwareVersion: VERSION,
-  author: {
-    "@type": "Person",
-    name: "Srinivas Gowda",
-    url: "https://github.com/solancer",
-  },
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${site.href}#website`,
+      url: site.href,
+      name: "Sarala",
+      description,
+      inLanguage: "en",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${site.href}#app`,
+      name: "Sarala",
+      alternateName: "Sarala Markdown Editor",
+      description,
+      url: site.href,
+      applicationCategory: "DeveloperApplication",
+      applicationSubCategory: "Markdown editor",
+      operatingSystem: "macOS, Windows, Linux",
+      softwareVersion: VERSION,
+      downloadUrl: RELEASES,
+      installUrl: `${site.href}#download`,
+      releaseNotes: `${RELEASES}/tag/v${VERSION}`,
+      license: "https://www.gnu.org/licenses/gpl-3.0.html",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      image: ogImageAbs,
+      screenshot: ["live-editor", "diagrams", "math", "ai-assistant", "voice-typing"].map(shot),
+      featureList: [
+        "Live WYSIWYG Markdown rendering without a preview pane",
+        "Mermaid and D2 diagrams",
+        "LaTeX math with KaTeX",
+        "Syntax highlighting for 100+ languages",
+        "Tables, task lists, footnotes and callouts",
+        "AI assistant with reviewable diffs",
+        "Offline voice typing",
+        "Thirteen themes",
+        "Export to HTML, PDF, Word, LaTeX and EPUB",
+      ],
+      author: { "@type": "Person", name: "Srinivas Gowda", url: "https://github.com/solancer" },
+      codeRepository: GITHUB,
+      isPartOf: { "@id": `${site.href}#website` },
+    },
+    ...extraLd,
+  ],
 };
 ---
 
@@ -51,20 +84,23 @@ const jsonLd = {
 <html lang="en" data-theme="classic">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1"} />
+    <meta name="author" content="Srinivas Gowda" />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#211f1c" />
     <meta name="color-scheme" content="dark light" />
 
-    <!-- Icons -->
-    <link rel="icon" type="image/png" href="/assets/sarala-icon.png" />
-    <link rel="apple-touch-icon" href="/assets/sarala-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Sarala" />
     <meta property="og:title" content={title} />
@@ -73,25 +109,22 @@ const jsonLd = {
     <meta property="og:image" content={ogImageAbs} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:locale" content="en_US" />
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageAbs} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
-    <link rel="sitemap" href="/sitemap-index.xml" />
-
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Theme is restored before paint to avoid a flash of the default palette -->
+    <!-- Restore the visitor's theme before first paint, so it never flashes. -->
     <script is:inline>
       (function () {
         try {
@@ -105,16 +138,15 @@ const jsonLd = {
       })();
     </script>
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
     <slot />
     <script src="../scripts/app.js"></script>
     <script src="../scripts/motion.js"></script>
     <script is:inline>
-      // Scroll-reveal content starts hidden and is animated in by the motion
-      // module. If that module never runs (old browser, blocked bundle), show
-      // everything rather than leaving the page blank.
+      // Reveal content is only hidden once motion.js marks <html class="mo">.
+      // If that module never finishes, show everything rather than a blank page.
       setTimeout(function () {
         var r = document.documentElement;
         if (!r.classList.contains("mo")) r.classList.add("mo-fallback");

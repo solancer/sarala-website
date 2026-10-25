@@ -294,4 +294,76 @@
     });
   }
   openThemes();
+
+  /* ---------- MOTION POLISH ---------- */
+  var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  // Section labels "decode" once as they come into view.
+  if (!calm && "IntersectionObserver" in window) {
+    var GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*/<>";
+    var decoder = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        decoder.unobserve(e.target);
+        var el = e.target, final = el.textContent, frame = 0, total = 18;
+        (function tick() {
+          frame++;
+          var shown = Math.floor((frame / total) * final.length);
+          el.textContent = final.split("").map(function (ch, i) {
+            return i < shown || ch === " " ? ch : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          }).join("");
+          if (frame < total) setTimeout(tick, 28); else el.textContent = final;
+        })();
+      });
+    }, { threshold: 1 });
+    document.querySelectorAll(".kicker .kx").forEach(function (k) { decoder.observe(k); });
+  }
+
+  // Showcase tabs: a thumb glides to the selected tab.
+  document.querySelectorAll(".tabs:not(.help-tabs)").forEach(function (list) {
+    var thumb = document.createElement("span");
+    thumb.className = "tab-thumb";
+    list.appendChild(thumb);
+    list.classList.add("has-thumb");
+    function place() {
+      var on = list.querySelector('[aria-selected="true"]');
+      if (!on) return;
+      thumb.style.width = on.offsetWidth + "px";
+      thumb.style.transform = "translateX(" + on.offsetLeft + "px)";
+      thumb.style.top = on.offsetTop + "px";
+      thumb.style.height = on.offsetHeight + "px";
+    }
+    list.addEventListener("click", function () { requestAnimationFrame(place); });
+    list.addEventListener("keyup", function () { requestAnimationFrame(place); });
+    window.addEventListener("resize", place);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    place();
+  });
+
+  if (finePointer && !calm) {
+    // Cards: a glow that follows the cursor.
+    document.querySelectorAll(".duo-card, .panel-card, .pcard, .help").forEach(function (card) {
+      card.classList.add("lit");
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      }, { passive: true });
+    });
+    // Hero windows lean toward the cursor, at most 3 degrees.
+    var stagePanel = document.querySelector(".stage-panel");
+    if (stagePanel) {
+      stagePanel.addEventListener("pointermove", function (e) {
+        var r = stagePanel.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        stagePanel.style.setProperty("--ty", (x * 6).toFixed(2) + "deg");
+        stagePanel.style.setProperty("--tx", (-y * 4).toFixed(2) + "deg");
+      }, { passive: true });
+      stagePanel.addEventListener("pointerleave", function () {
+        stagePanel.style.setProperty("--ty", "0deg");
+        stagePanel.style.setProperty("--tx", "0deg");
+      });
+    }
+  }
 })();

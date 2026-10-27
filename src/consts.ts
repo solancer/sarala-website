@@ -3,7 +3,7 @@
  * Bump VERSION (and the sizes) after a new GitHub release and every
  * download link, filename and version badge on the site follows.
  */
-export const VERSION = "1.3.3";
+export const VERSION = "1.4.0";
 
 export const GITHUB = "https://github.com/solancer/sarala";
 export const RELEASES = `${GITHUB}/releases`;

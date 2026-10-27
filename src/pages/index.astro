@@ -140,6 +140,7 @@ const LINUX_CMDS = [
   { id: "lx-snap", label: "Snap Store (any distribution)", cmd: "sudo snap install sarala" },
   { id: "lx-deb", label: "Ubuntu, Debian, Mint (.deb)", cmd: `sudo apt install ./${ALT.deb}` },
   { id: "lx-rpm", label: "Fedora, RHEL, openSUSE (.rpm)", cmd: `sudo dnf install ./${ALT.rpm}` },
+  { id: "lx-arch", label: "Arch, Manjaro, Omarchy (no build step)", cmd: `git clone --depth 1 ${GITHUB} && cd sarala/aur/sarala-bin && makepkg -si` },
   { id: "lx-appimage", label: "Any distribution (AppImage)", cmd: `chmod +x ${BUILDS.linux.file} && ./${BUILDS.linux.file}` },
 ];
 

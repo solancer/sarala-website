@@ -2,12 +2,11 @@
 import Layout from "../layouts/Layout.astro";
 import VoicePill from "../components/VoicePill.astro";
 import { BRAND, type Brand } from "../brand-icons";
-import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, ALT_SIZE, MAC_APP_PATH } from "../consts";
+import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, ALT_SIZE } from "../consts";
 
 const LICENSE = `${GITHUB}/blob/main/LICENSE`;
 const ISSUES = `${GITHUB}/issues`;
 const CONTRIBUTING = `${GITHUB}/blob/main/CONTRIBUTING.md`;
-const QUARANTINE_CMD = `xattr -dr com.apple.quarantine ${MAC_APP_PATH}`;
 const BREW_CMDS = [
   `brew tap solancer/sarala ${GITHUB}`,
   "brew trust --cask solancer/sarala/sarala",
@@ -461,27 +460,15 @@ const faqLd = {
             <div class="help-cols">
               <section aria-labelledby="gk-title" id="macos-first-launch">
                 <h4 id="gk-title">With the .dmg</h4>
-                <p>Sarala isn't notarized by Apple, so macOS blocks the first launch. One command clears it.</p>
+                <p>Sarala is signed and notarized by Apple, so it opens like any other app.</p>
                 <ol class="way-steps">
-                  <li><span>Drag <b>Sarala</b> into <b>Applications</b>.</span></li>
-                  <li><span>Run this once in <b>Terminal</b>, then open Sarala.</span></li>
+                  <li><span>Open <b>{BUILDS.mac.file}</b>.</span></li>
+                  <li><span>Drag <b>Sarala</b> into <b>Applications</b>, then open it.</span></li>
                 </ol>
-                <div class="cmd">
-                  <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#gk-cmd"><span class="gk-copy-label">Copy</span></button></div>
-                  <pre id="gk-cmd"><code>{QUARANTINE_CMD}</code></pre>
-                </div>
-                <details class="way-more">
-                  <summary>No Terminal? Use System Settings instead</summary>
-                  <ol class="way-steps">
-                    <li><span>Open Sarala. When macOS blocks it, click <b>Done</b>.</span></li>
-                    <li><span>In <b>System Settings › Privacy &amp; Security</b>, click <b>Open Anyway</b>.</span></li>
-                  </ol>
-                  <p class="fine">On macOS 14 or older, right-click Sarala and choose <b>Open</b>. A "Sarala is damaged" message is the same warning, and either route clears it.</p>
-                </details>
               </section>
               <section aria-labelledby="brew-title" id="macos-homebrew">
                 <h4 id="brew-title">With Homebrew <span class="way-tag">Recommended</span></h4>
-                <p>No security prompt, and <code>brew upgrade</code> keeps Sarala up to date.</p>
+                <p><code>brew upgrade</code> keeps Sarala up to date.</p>
                 <div class="cmd">
                   <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
                   <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>

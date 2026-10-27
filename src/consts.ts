@@ -3,7 +3,7 @@
  * Bump VERSION (and the sizes) after a new GitHub release and every
  * download link, filename and version badge on the site follows.
  */
-export const VERSION = "1.4.0";
+export const VERSION = "1.4.1";
 
 export const GITHUB = "https://github.com/solancer/sarala";
 export const RELEASES = `${GITHUB}/releases`;
@@ -35,5 +35,3 @@ export const ALT = {
 /** Sizes of the secondary packages, shown beside their links. */
 export const ALT_SIZE = { deb: "16.6 MB", rpm: "16.6 MB", msi: "15.0 MB" };
 
-/** The app bundle name Gatekeeper sees once Sarala is in /Applications. */
-export const MAC_APP_PATH = "/Applications/Sarala.app";

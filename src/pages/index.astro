@@ -465,10 +465,10 @@ const faqLd = {
                   <li><span>Open <b>{BUILDS.mac.file}</b>.</span></li>
                   <li><span>Drag <b>Sarala</b> into <b>Applications</b>, then open it.</span></li>
                 </ol>
+                <p>Sarala updates itself: when a new version is out, it asks before installing.</p>
               </section>
               <section aria-labelledby="brew-title" id="macos-homebrew">
                 <h4 id="brew-title">With Homebrew</h4>
-                <p><code>brew upgrade</code> keeps Sarala up to date.</p>
                 <div class="cmd">
                   <div class="cmd-bar"><span>Terminal</span><button type="button" class="gk-copy copy-btn" data-copy="#brew-cmd"><span class="gk-copy-label">Copy</span></button></div>
                   <pre id="brew-cmd">{BREW_CMDS.map((cmd) => <code class="ln">{cmd}</code>)}</pre>

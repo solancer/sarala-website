@@ -3,7 +3,11 @@
  * Bump VERSION (and the sizes) after a new GitHub release and every
  * download link, filename and version badge on the site follows.
  */
-export const VERSION = "1.4.2";
+/** The web app. It versions and releases apart from the desktop app. */
+export const WEB_HOST = "web.sarala.solancer.com";
+export const WEB_URL = `https://${WEB_HOST}/`;
+
+export const VERSION = "1.5.0";
 
 export const GITHUB = "https://github.com/solancer/sarala";
 export const RELEASES = `${GITHUB}/releases`;
@@ -21,7 +25,7 @@ export interface Build {
 /** Primary download per platform, keyed by the OS-picker value. */
 export const BUILDS: Record<OsKey, Build> = {
   linux: { label: "Linux", file: `Sarala_${VERSION}_amd64.AppImage`, size: "101.2 MB" },
-  mac: { label: "macOS", file: `Sarala_${VERSION}_universal.dmg`, size: "31.8 MB" },
+  mac: { label: "macOS", file: `Sarala_${VERSION}_universal.dmg`, size: "31.7 MB" },
   win: { label: "Windows", file: `Sarala_${VERSION}_x64-setup.exe`, size: "13.4 MB" },
 };
 
@@ -33,5 +37,5 @@ export const ALT = {
 };
 
 /** Sizes of the secondary packages, shown beside their links. */
-export const ALT_SIZE = { deb: "16.6 MB", rpm: "16.6 MB", msi: "15.0 MB" };
+export const ALT_SIZE = { deb: "16.6 MB", rpm: "16.6 MB", msi: "14.9 MB" };
 

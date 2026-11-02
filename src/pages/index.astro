@@ -1,8 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import VoicePill from "../components/VoicePill.astro";
+import WebTry from "../components/WebTry.astro";
 import { BRAND, type Brand } from "../brand-icons";
-import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, ALT_SIZE } from "../consts";
+import { VERSION, GITHUB, RELEASES, SNAP, DL, BUILDS, ALT, ALT_SIZE, WEB_URL } from "../consts";
 
 const LICENSE = `${GITHUB}/blob/main/LICENSE`;
 const ISSUES = `${GITHUB}/issues`;
@@ -161,8 +162,12 @@ const FAQ = [
     a: [`No. Sarala only goes online to check for updates, to load images your documents link to, and to download the speech model if you turn on voice typing. The AI assistant uses whichever agent you have installed, so it follows that agent's own connection and sign-in.`],
   },
   {
-    q: "Is there a mobile or web version?",
-    a: [`Not yet. Sarala is a desktop app for macOS, Windows and Linux. Because your documents are plain files, you can read and edit them on other devices with any Markdown app.`],
+    q: "Is there a web version?",
+    a: [`Yes. Sarala runs in your browser at web.sarala.solancer.com, with no account and nothing to install. It keeps documents in your browser, or in real folders in Chrome and Edge, and works offline after the first visit. It also works on phones. The AI assistant is desktop only, because it runs the coding agents on your computer.`],
+  },
+  {
+    q: "Where does the web version keep my documents?",
+    a: [`On your device. There is no server. Browser storage belongs to that browser, so clearing the site's data clears the library too. Back up from the Menu to get a zip of plain files, or work in a real folder.`],
   },
 ];
 const faqLd = {
@@ -185,6 +190,7 @@ const faqLd = {
         Sarala
       </a>
       <nav class="nav-links" aria-label="Main">
+        <a href="#web">Try it</a>
         <a href="#features">Features</a>
         <a href="#ai">AI &amp; voice</a>
         <a href="#themes">Themes</a>
@@ -213,15 +219,15 @@ const faqLd = {
         <div class="hero-mark">
           <img src="/assets/icon-256.png" alt="" width="116" height="116" fetchpriority="high" />
         </div>
-        <a class="eyebrow" href="#ai"><span class="pip" aria-hidden="true"></span><span class="eb-lead">free &amp; open source · v{VERSION} ·</span> <b>new: AI assistant &amp; voice typing</b></a>
+        <a class="eyebrow" href="#web"><span class="pip" aria-hidden="true"></span><span class="eb-lead">free &amp; open source · v{VERSION} ·</span> <b>new: Sarala in your browser</b></a>
         <h1 id="hero-title">Markdown that reads like a <span class="grad">finished&nbsp;document.</span></h1>
         <p class="hero-sub">
-          Sarala is a free, open-source WYSIWYG Markdown editor for macOS, Windows and Linux. Write plain Markdown and
+          Sarala is a free, open-source WYSIWYG Markdown editor for macOS, Windows, Linux and the web. Write plain Markdown and
           see the finished document on the same page, with no preview pane and no split view.
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" id="hero-dl" href="#download"><Fragment set:html={svg("download", "ico")} /><span>Download free</span></a>
-          <a class="btn btn-ghost" href={GITHUB} target="_blank" rel="noopener"><Fragment set:html={svg("github", "ico")} />View on GitHub</a>
+          <a class="btn btn-ghost" href="#web">Try it in your browser</a>
         </div>
 
         <!-- Real light-theme screenshots of the desktop app, fanned out on a
@@ -246,6 +252,9 @@ const faqLd = {
         </figure>
       </div>
     </section>
+
+    <!-- ============ WEB ============ -->
+    <WebTry />
 
     <!-- ============ SHOWCASE ============ -->
     <section class="section" id="features" aria-labelledby="showcase-title">
@@ -396,7 +405,7 @@ const faqLd = {
         <div class="dl-head reveal">
           <span class="kicker"><span class="visually-hidden">Download</span><span class="kx" aria-hidden="true">Download</span></span>
           <h2 id="dl-title">Get Sarala</h2>
-          <p>Free and open source (GPL-3.0) for macOS, Windows and Linux.</p>
+          <p>Free and open source (GPL-3.0) for macOS, Windows and Linux. Or <a href={WEB_URL} target="_blank" rel="noopener">open it in your browser</a> with nothing to install.</p>
           <ul class="trust" aria-label="Why it's safe to try">
             <li><Fragment set:html={svg("shield")} />No telemetry, no account</li>
             <li><Fragment set:html={svg("heart")} />No paid tier, ever</li>
@@ -551,6 +560,7 @@ const faqLd = {
             <li><a href="#voice">Voice typing</a></li>
             <li><a href="#themes">Themes</a></li>
             <li><a href="#download">Download</a></li>
+            <li><a href={WEB_URL} target="_blank" rel="noopener">Web app</a></li>
           </ul>
         </nav>
         <nav class="footer-col" aria-labelledby="f-res">

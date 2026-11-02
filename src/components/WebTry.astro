@@ -1,0 +1,126 @@
+---
+import { WEB_URL, WEB_HOST } from "../consts";
+---
+<section class="section web-try" id="web" aria-labelledby="web-title">
+  <div class="wrap">
+    <div class="wt-head reveal">
+      <span class="kicker"><span class="visually-hidden">New</span><span class="kx" aria-hidden="true">new</span></span>
+      <h2 id="web-title">Nothing to install. Start typing.</h2>
+      <p>Sarala now runs in your browser. It's the same editor, and your writing still never leaves your device.</p>
+    </div>
+
+    <div class="wt-window reveal" id="wt-window">
+      <div class="wt-bar">
+        <span class="wt-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="wt-address">{WEB_HOST}</span>
+      </div>
+      <div class="wt-view">
+        <div class="wt-poster" id="wt-poster">
+          <div class="wt-page" aria-hidden="true">
+            <p class="wt-line" id="wt-line"><span class="wt-mark"># </span><span id="wt-typed">Write here</span><span class="wt-caret"></span></p>
+            <p class="wt-body">Click, type, and the page renders itself.</p>
+          </div>
+          <a class="btn btn-primary wt-start" id="wt-start" href={WEB_URL} target="_blank" rel="noopener">Start writing</a>
+        </div>
+      </div>
+    </div>
+
+    <ul class="wt-facts reveal">
+      <li><b>Yours alone.</b> No account and no server. Documents stay in this browser, or in real folders in Chrome and Edge.</li>
+      <li><b>Works offline.</b> After the first visit it opens without a connection, and it installs as an app.</li>
+      <li><b>Handles big files.</b> Tens of thousands of lines open quickly and scroll smoothly.</li>
+    </ul>
+    <p class="wt-more reveal"><a href={WEB_URL} target="_blank" rel="noopener">Open the full app in a new tab</a></p>
+  </div>
+</section>
+
+<script define:vars={{ WEB_URL }}>
+  const start = document.getElementById("wt-start");
+  const view = document.querySelector(".wt-view");
+  const typed = document.getElementById("wt-typed");
+  const line = document.getElementById("wt-line");
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Typed Markdown becoming a heading: the whole idea of the editor, once.
+  if (typed && line && !still) {
+    const text = typed.textContent;
+    const once = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      once.disconnect();
+      typed.textContent = "";
+      line.classList.add("wt-typing");
+      let i = 0;
+      const step = () => {
+        typed.textContent = text.slice(0, ++i);
+        if (i < text.length) setTimeout(step, 70 + Math.random() * 60);
+        else setTimeout(() => line.classList.remove("wt-typing"), 650);
+      };
+      setTimeout(step, 500);
+    }, { threshold: 0.6 });
+    once.observe(line);
+  } 
+
+  // A wide screen gets the real editor in place. A phone follows the link,
+  // since an editor needs the whole screen there.
+  start?.addEventListener("click", (e) => {
+    if (innerWidth < 800) return;
+    e.preventDefault();
+    const frame = document.createElement("iframe");
+    frame.src = WEB_URL;
+    frame.title = "Sarala editor";
+    frame.allow = "clipboard-read; clipboard-write";
+    view.append(frame);
+    frame.addEventListener("load", () => {
+      document.getElementById("wt-poster")?.remove();
+      frame.focus();
+    });
+    start.textContent = "Opening…";
+    start.setAttribute("aria-busy", "true");
+  });
+</script>
+
+<style>
+  .web-try { position: relative; }
+  .wt-head { max-width: 640px; margin: 0 auto 32px; text-align: center; }
+  .wt-head h2 { margin-top: 10px; }
+  .wt-head p { margin-top: 12px; color: var(--muted); }
+
+  .wt-window {
+    max-width: 960px; margin-inline: auto; overflow: hidden;
+    border: 1px solid var(--border); border-radius: 14px; background: var(--bg-panel);
+    box-shadow: 0 24px 60px color-mix(in srgb, var(--fg) 14%, transparent);
+  }
+  .wt-bar { position: relative; display: flex; align-items: center; height: 42px; padding: 0 14px; border-bottom: 1px solid var(--border); }
+  .wt-dots { display: inline-flex; gap: 7px; }
+  .wt-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); opacity: .55; }
+  .wt-address {
+    position: absolute; left: 50%; transform: translateX(-50%); max-width: calc(100% - 120px);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    padding: 4px 16px; border-radius: 7px; background: var(--bg); color: var(--muted); font-size: 13px;
+  }
+  .wt-view { position: relative; height: clamp(420px, 62vh, 620px); background: var(--bg-panel); }
+  .wt-view :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  .wt-poster { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; background: var(--bg-panel); }
+  .wt-page { position: absolute; top: 16%; left: 50%; transform: translateX(-50%); width: min(560px, 100% - 48px); }
+  .wt-line { margin: 0; font: 600 clamp(32px, 5vw, 46px)/1.2 Georgia, "Noto Serif", serif; letter-spacing: -.015em; color: var(--fg); }
+  .wt-mark { display: none; color: var(--accent); opacity: .7; }
+  .wt-caret { display: none; width: 2px; height: .95em; margin-left: 2px; vertical-align: -.1em; background: var(--accent); }
+  .wt-typing { font: 400 18px/1.7 Georgia, "Noto Serif", serif; letter-spacing: 0; }
+  .wt-typing .wt-mark { display: inline; }
+  .wt-typing .wt-caret { display: inline-block; animation: wt-blink 1s steps(2) infinite; }
+  .wt-body { margin: 16px 0 0; font: 18px/1.7 Georgia, "Noto Serif", serif; color: var(--muted); }
+  .wt-start { position: absolute; bottom: 18%; }
+  @keyframes wt-blink { 50% { opacity: 0; } }
+
+  .wt-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 960px; margin: 28px auto 0; padding: 0; list-style: none; color: var(--muted); font-size: 15px; line-height: 1.55; }
+  .wt-facts b { display: block; margin-bottom: 2px; color: var(--fg); font-weight: 600; }
+  .wt-more { margin: 22px 0 0; text-align: center; font-size: 15px; }
+  .wt-more a { color: var(--accent); }
+
+  @media (max-width: 760px) {
+    .wt-view { height: 340px; }
+    .wt-facts { grid-template-columns: 1fr; gap: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wt-typing .wt-caret { animation: none; } }
+</style>

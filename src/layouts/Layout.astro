@@ -81,7 +81,7 @@ const jsonLd = {
 ---
 
 <!doctype html>
-<html lang="en" data-theme="classic">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -92,8 +92,8 @@ const jsonLd = {
     <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1"} />
     <meta name="author" content="Srinivas Gowda" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#211f1c" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#fffefa" />
+    <meta name="color-scheme" content="light" />
 
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
@@ -120,37 +120,14 @@ const jsonLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Caveat:wght@600&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Kannada:wght@500;800&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Restore the visitor's theme before first paint, so it never flashes. -->
-    <script is:inline>
-      (function () {
-        try {
-          var t = localStorage.getItem("sarala-theme");
-          var ok = ["pro", "classic", "octagon", "machine", "ristretto", "spectrum", "paper"];
-          if (t && ok.indexOf(t) !== -1) {
-            document.documentElement.setAttribute("data-theme", t);
-            document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "paper" ? "#f3eee3" : "#221f22");
-          }
-        } catch (e) {}
-      })();
-    </script>
 
     {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
     <slot />
     <script src="../scripts/app.js"></script>
-    <script src="../scripts/motion.js"></script>
-    <script is:inline>
-      // Reveal content is only hidden once motion.js marks <html class="mo">.
-      // If that module never finishes, show everything rather than a blank page.
-      setTimeout(function () {
-        var r = document.documentElement;
-        if (!r.classList.contains("mo")) r.classList.add("mo-fallback");
-      }, 2500);
-    </script>
   </body>
 </html>

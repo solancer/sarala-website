@@ -1,0 +1,96 @@
+---
+/**
+ * The drafting-table backdrop: pale paper planes, dashed guides and a
+ * ruler. Pure decoration, stretched to its section with
+ * non-scaling strokes so lines stay hairline at any size.
+ */
+interface Props { variant?: "hero" | "closing" | "corner" | "band" }
+const { variant = "hero" } = Astro.props;
+const ticks = (x0: number, x1: number, y: number, step: number, dir = -1) =>
+  Array.from({ length: Math.floor((x1 - x0) / step) + 1 }, (_, i) => {
+    const x = x0 + i * step;
+    const h = i % 5 === 0 ? 16 : 8;
+    return `M${x} ${y}v${dir * h}`;
+  }).join("");
+---
+<div class="plane" aria-hidden="true">
+  {variant === "hero" && (
+    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pl-h1" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ebe3d3" />
+          <stop offset=".55" stop-color="#f2ece0" />
+          <stop offset="1" stop-color="#fbf8f1" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="pl-h2" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0" stop-color="#e4dac6" stop-opacity=".7" />
+          <stop offset="1" stop-color="#efe8db" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="M720 0H1000V1000H170Z" fill="url(#pl-h1)" />
+      <path d="M880 0H1000V560Z" fill="url(#pl-h2)" />
+      <g fill="none" stroke="#c9bca6" vector-effect="non-scaling-stroke">
+        <path d="M720 0L170 1000" vector-effect="non-scaling-stroke" />
+        <path d="M880 0L1000 560" vector-effect="non-scaling-stroke" opacity=".7" />
+        <path d="M930 0V1000" stroke-dasharray="6 7" vector-effect="non-scaling-stroke" opacity=".55" />
+        <path d="M640 470H1000" stroke-dasharray="6 7" vector-effect="non-scaling-stroke" opacity=".4" />
+      </g>
+    </svg>
+  )}
+  {variant === "band" && (
+    <svg viewBox="0 0 1000 300" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pl-b" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ece4d5" />
+          <stop offset="1" stop-color="#fbf8f1" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="M760 0H1000V300H450Z" fill="url(#pl-b)" />
+      <g fill="none" stroke="#c9bca6">
+        <path d="M760 0L450 300" vector-effect="non-scaling-stroke" />
+        <path d="M640 0L340 300" vector-effect="non-scaling-stroke" opacity=".5" />
+        <path d="M560 160H1000" vector-effect="non-scaling-stroke" opacity=".45" />
+        <path d="M940 0V300" stroke-dasharray="6 7" vector-effect="non-scaling-stroke" opacity=".5" />
+      </g>
+    </svg>
+  )}
+  {variant === "corner" && (
+    <svg viewBox="0 0 400 300" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pl-c" x1="1" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#ebe3d3" />
+          <stop offset="1" stop-color="#fbf8f1" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="M0 300L400 60V300Z" fill="url(#pl-c)" />
+      <g fill="none" stroke="#c9bca6">
+        <path d="M0 300L400 60" vector-effect="non-scaling-stroke" />
+        <path d="M240 100V300" stroke-dasharray="5 6" vector-effect="non-scaling-stroke" opacity=".6" />
+        <path d={ticks(160, 400, 300, 16)} vector-effect="non-scaling-stroke" opacity=".7" />
+      </g>
+    </svg>
+  )}
+  {variant === "closing" && (
+    <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pl-l" x1="0" y1="1" x2=".6" y2="0">
+          <stop offset="0" stop-color="#ebe3d3" />
+          <stop offset="1" stop-color="#fbf8f1" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="pl-r" x1="1" y1="1" x2=".4" y2="0">
+          <stop offset="0" stop-color="#ebe3d3" />
+          <stop offset="1" stop-color="#fbf8f1" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="M0 260L260 600H0Z" fill="url(#pl-l)" />
+      <path d="M1000 260L740 600H1000Z" fill="url(#pl-r)" />
+      <g fill="none" stroke="#c9bca6">
+        <path d="M0 260L260 600M1000 260L740 600" vector-effect="non-scaling-stroke" />
+        <path d="M0 470H150M1000 470H850" vector-effect="non-scaling-stroke" opacity=".5" />
+        <path d="M500 0V90M500 510V600" stroke-dasharray="5 6" vector-effect="non-scaling-stroke" opacity=".7" />
+        <path d={ticks(30, 220, 600, 12)} vector-effect="non-scaling-stroke" opacity=".7" />
+        <path d={ticks(780, 970, 600, 12)} vector-effect="non-scaling-stroke" opacity=".7" />
+      </g>
+    </svg>
+  )}
+</div>

@@ -11,8 +11,17 @@ Live at **[sarala.solancer.com](https://sarala.solancer.com)**.
   default, so the page is fully server-rendered HTML for fast loads and clean SEO.
 - **[@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)** —
   generates `sitemap-index.xml` at build time.
-- A single small client script (`src/scripts/app.js`) powers the live palette switcher,
-  the hero typing demo, scroll reveals, and the source/rendered toggle.
+- A single small client script (`src/scripts/app.js`) plays the product clips while they
+  are on screen, runs the tabs and copy buttons, and reveals sections on scroll. Nothing
+  autoplays for visitors who ask for reduced motion.
+
+## Product clips
+
+`public/video/*.mp4` are real recordings of Sarala for the web, each with a `.webp`
+poster of its finished frame. To re-record after a release, serve the web app from the
+sarala repo (`pnpm build:web && cd web && pnpm preview`), then run
+`node scripts/record-clips.mjs [scene...]`. It needs Playwright (taken from the sarala
+repo), `ffmpeg` and `cwebp`.
 
 ## SEO
 
@@ -20,7 +29,6 @@ Live at **[sarala.solancer.com](https://sarala.solancer.com)**.
 - Open Graph + Twitter Card tags (`og:image` uses `public/screenshots/og.png`, 1200×630).
 - `SoftwareApplication` JSON-LD structured data.
 - `robots.txt` and an auto-generated sitemap.
-- Theme palette is restored before first paint to avoid a flash of the default colors.
 
 ## Develop
 

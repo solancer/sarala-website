@@ -13,45 +13,28 @@ const LINES: { kind: "h1" | "task" | "p"; pieces: Piece[] }[] = [
 ];
 const text = (p: Piece) => (typeof p === "string" ? p : "m" in p ? p.m : p.b);
 ---
-<section class="section web-try" id="web" aria-labelledby="web-title">
-  <div class="wrap wt-grid">
-    <div class="wt-head reveal">
-      <span class="kicker"><span class="visually-hidden">New</span><span class="kx" aria-hidden="true">new</span></span>
-      <h2 id="web-title">Nothing to install. Start typing.</h2>
-      <p class="wt-lede">Sarala now runs in your browser. It's the same editor, and your writing still never leaves your device.</p>
-      <a class="btn btn-primary wt-open" href={WEB_URL} target="_blank" rel="noopener">Open Sarala in your browser</a>
-    </div>
-
-    <ul class="wt-facts reveal">
-      <li><b>Yours alone.</b> No account and no server. Documents stay in this browser, or in real folders in Chrome and Edge.</li>
-      <li><b>Works offline.</b> After the first visit it opens without a connection, and it installs as an app.</li>
-      <li><b>Handles big files.</b> Tens of thousands of lines open quickly and scroll smoothly.</li>
-    </ul>
-
-    <figure class="wt-window reveal" aria-label="The Sarala web app turning typed Markdown into a formatted page">
-      <div class="wt-bar">
-        <span class="wt-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <a class="wt-address" href={WEB_URL} target="_blank" rel="noopener" tabindex="-1">{WEB_HOST}</a>
-      </div>
-      <div class="wt-doc" id="wt-doc" aria-hidden="true">
-        {LINES.map((line) => (
-          <p class={`wt-line wt-${line.kind} done`}>
-            {line.kind === "task" && <span class={`wt-box${text(line.pieces[0]).includes("x") ? " on" : ""}`}></span>}
-            {line.pieces.map((p) =>
-              typeof p === "string" ? <span class="wt-t" data-t={p}>{p}</span>
-              : "m" in p ? <span class="wt-t wt-mk" data-t={p.m}>{p.m}</span>
-              : <strong class="wt-t" data-t={p.b}>{p.b}</strong>
-            )}
-          </p>
-        ))}
-      </div>
-      <div class="wt-status" aria-hidden="true">
-        <span>Markdown</span>
-        <span class="wt-saved" id="wt-saved"><i></i>Saved on this device</span>
-      </div>
-    </figure>
+<figure class="wt-window" aria-label="The Sarala web app turning typed Markdown into a formatted page">
+  <div class="wt-bar">
+    <span class="wt-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <a class="wt-address" href={WEB_URL} target="_blank" rel="noopener" tabindex="-1">{WEB_HOST}</a>
   </div>
-</section>
+  <div class="wt-doc" id="wt-doc" aria-hidden="true">
+    {LINES.map((line) => (
+      <p class={`wt-line wt-${line.kind} done`}>
+        {line.kind === "task" && <span class={`wt-box${text(line.pieces[0]).includes("x") ? " on" : ""}`}></span>}
+        {line.pieces.map((p) =>
+          typeof p === "string" ? <span class="wt-t" data-t={p}>{p}</span>
+          : "m" in p ? <span class="wt-t wt-mk" data-t={p.m}>{p.m}</span>
+          : <strong class="wt-t" data-t={p.b}>{p.b}</strong>
+        )}
+      </p>
+    ))}
+  </div>
+  <div class="wt-status" aria-hidden="true">
+    <span>Markdown</span>
+    <span class="wt-saved" id="wt-saved"><i></i>Saved on this device</span>
+  </div>
+</figure>
 
 <script>
   const doc = document.getElementById("wt-doc");
@@ -103,43 +86,28 @@ const text = (p: Piece) => (typeof p === "string" ? p : "m" in p ? p.m : p.b);
 </script>
 
 <style>
-  /* Desktop: copy and facts on the left, the demo spanning both on the right.
-     Narrow: heading and button, then the demo, then the facts. */
-  .wt-grid {
-    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-areas: "head win" "facts win";
-    column-gap: clamp(32px, 5vw, 72px); row-gap: 34px;
-  }
-  .wt-head { grid-area: head; align-self: end; }
-  .wt-window { grid-area: win; align-self: center; }
-  .wt-facts { grid-area: facts; align-self: start; }
-  .wt-head h2 { margin-top: 12px; }
-  .wt-lede { margin-top: 14px; max-width: 42ch; color: var(--muted); }
-  .wt-open { margin-top: 26px; }
-
-  .wt-facts { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; max-width: 46ch; color: var(--muted); font-size: 15px; line-height: 1.55; }
-  .wt-facts b { color: var(--fg); font-weight: 600; }
-
-  /* ---- The window ---- */
   .wt-window {
     margin: 0; overflow: hidden;
-    border: 1px solid var(--border); border-radius: 14px; background: var(--bg-panel);
-    box-shadow: 0 30px 70px -30px color-mix(in srgb, var(--fg) 30%, transparent);
+    border: 1px solid var(--line-strong); border-radius: 12px; background: var(--paper);
+    box-shadow: var(--shadow-canvas);
   }
-  .wt-bar { position: relative; display: flex; align-items: center; height: 40px; padding: 0 14px; border-bottom: 1px solid var(--border); }
+  .wt-bar { position: relative; display: flex; align-items: center; height: 40px; padding: 0 14px; border-bottom: 1px solid var(--line); background: #f6f1e7; }
   .wt-dots { display: inline-flex; gap: 7px; }
-  .wt-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); opacity: .55; }
+  .wt-dots i { width: 11px; height: 11px; border-radius: 50%; background: #f0a096; }
+  .wt-dots i:nth-child(2) { background: #eec870; }
+  .wt-dots i:nth-child(3) { background: #9ec888; }
   .wt-address {
     position: absolute; left: 50%; transform: translateX(-50%); max-width: calc(100% - 120px);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    padding: 3px 14px; border-radius: 7px; background: var(--bg); color: var(--muted); font-size: 12.5px; text-decoration: none;
+    padding: 4px 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper);
+    color: var(--muted); font-size: 12.5px; text-decoration: none;
   }
-  .wt-address:hover { color: var(--fg); }
+  .wt-address:hover { color: var(--ink); }
 
   /* The page: the editor's own measure and type (Inter, 16px base). */
   .wt-doc {
-    padding: clamp(28px, 4vw, 44px) clamp(24px, 5vw, 56px) clamp(28px, 4vw, 40px);
-    font: 400 16px/1.6 Inter, system-ui, sans-serif; color: var(--fg);
+    padding: clamp(28px, 4vw, 44px) clamp(24px, 5vw, 52px) clamp(28px, 4vw, 40px);
+    font: 400 16px/1.6 Inter, system-ui, sans-serif; color: #2b2620; background: #f9f5ee;
   }
   .wt-line { margin: 0; min-height: 1.6em; }
   .wt-h1 { margin-bottom: 14px; font-size: 30px; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; min-height: 1.25em; }
@@ -148,38 +116,27 @@ const text = (p: Piece) => (typeof p === "string" ? p : "m" in p ? p.m : p.b);
   .wt-p strong { font-weight: 700; }
 
   /* Markers show while the line is being typed and vanish once it's done. */
-  .wt-mk { color: var(--accent); opacity: .65; }
+  .wt-mk { color: var(--terra); opacity: .7; }
   .wt-line.done .wt-mk { display: none; }
-  .wt-box {
-    display: none; flex: none; position: relative; top: 1px; width: 13px; height: 13px;
-    border: 1px solid var(--muted); border-radius: 3px;
-  }
-  .wt-box.on { background: var(--accent); border-color: var(--accent); }
+  .wt-box { display: none; flex: none; position: relative; top: 1px; width: 13px; height: 13px; border: 1px solid #686155; border-radius: 3px; }
+  .wt-box.on { background: var(--terra); border-color: var(--terra); }
   .wt-box.on::after {
     content: ""; position: absolute; left: 3.5px; top: 1px; width: 3.5px; height: 7px;
-    border: solid var(--on-accent); border-width: 0 2px 2px 0; transform: rotate(45deg);
+    border: solid #fff8f2; border-width: 0 2px 2px 0; transform: rotate(45deg);
   }
   .wt-line.done .wt-box { display: inline-block; }
 
-  .wt-caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 1px; vertical-align: -.15em; background: var(--accent); animation: wt-blink 1s steps(2) infinite; }
+  .wt-caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 1px; vertical-align: -.15em; background: var(--terra); animation: wt-blink 1s steps(2) infinite; }
   @keyframes wt-blink { 50% { opacity: 0; } }
 
-  .wt-status {
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    padding: 8px 16px; border-top: 1px solid var(--border);
-    font-size: 12px; color: var(--muted);
-  }
+  .wt-status { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 16px; border-top: 1px solid var(--line); background: #f9f5ee; font-size: 12px; color: var(--muted); }
   .wt-saved { display: inline-flex; align-items: center; gap: 7px; opacity: 0; transition: opacity .4s ease; }
   .wt-saved.on { opacity: 1; }
   .wt-saved i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
 
-  @media (max-width: 900px) {
-    .wt-grid { grid-template-columns: 1fr; grid-template-areas: "head" "win" "facts"; row-gap: 32px; }
-    .wt-head, .wt-facts { max-width: 600px; }
-  }
   @media (max-width: 520px) {
     .wt-h1 { font-size: 26px; }
-    .wt-p { min-height: 3.2em; } /* wraps to two lines here; reserve them */
+    .wt-p { min-height: 3.2em; }
   }
   @media (prefers-reduced-motion: reduce) {
     .wt-caret { animation: none; }

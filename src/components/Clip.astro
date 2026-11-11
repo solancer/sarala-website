@@ -1,0 +1,43 @@
+---
+/**
+ * A screen recording of the real app in a window frame. Recordings live
+ * in public/video as <name>.mp4 with a <name>.webp poster (the finished
+ * frame, so the page reads correctly before the video plays or if it
+ * never does). app.js plays a clip while it is on screen and never
+ * autoplays for visitors who ask for reduced motion.
+ */
+interface Props {
+  name: string;
+  /** Window title, e.g. "Launch notes.md". */
+  title: string;
+  /** What the recording shows, for screen readers. */
+  label: string;
+  /** Width / height of the recording, e.g. "1120 / 560". */
+  ar: string;
+  loop?: boolean;
+  eager?: boolean;
+  class?: string;
+}
+const { name, title, label, ar, loop = true, eager = false, class: cls = "" } = Astro.props;
+---
+<figure class={`win ${cls}`} style={`--ar:${ar}`}>
+  <div class="win-bar" aria-hidden="true">
+    <span class="lights"><i></i><i></i><i></i></span>
+    <span class="title">{title} <b>· Sarala</b></span>
+  </div>
+  <video
+    data-clip
+    src={`/video/${name}.mp4`}
+    poster={`/video/${name}.webp`}
+    muted
+    playsinline
+    loop={loop}
+    preload={eager ? "auto" : "none"}
+    aria-label={label}
+    width="1920"
+  ></video>
+  <button type="button" class="play" aria-label={`Pause: ${label}`}>
+    <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+    <svg class="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" /></svg>
+  </button>
+</figure>

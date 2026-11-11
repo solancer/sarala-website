@@ -7,7 +7,7 @@
 export const WEB_HOST = "web.sarala.solancer.com";
 export const WEB_URL = `https://${WEB_HOST}/`;
 
-export const VERSION = "1.5.0";
+export const VERSION = "1.6.0";
 
 export const GITHUB = "https://github.com/solancer/sarala";
 export const RELEASES = `${GITHUB}/releases`;
@@ -24,7 +24,7 @@ export interface Build {
 
 /** Primary download per platform, keyed by the OS-picker value. */
 export const BUILDS: Record<OsKey, Build> = {
-  linux: { label: "Linux", file: `Sarala_${VERSION}_amd64.AppImage`, size: "101.2 MB" },
+  linux: { label: "Linux", file: `Sarala_${VERSION}_amd64.AppImage`, size: "110.5 MB" },
   mac: { label: "macOS", file: `Sarala_${VERSION}_universal.dmg`, size: "31.7 MB" },
   win: { label: "Windows", file: `Sarala_${VERSION}_x64-setup.exe`, size: "13.4 MB" },
 };
